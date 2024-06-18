@@ -49,8 +49,5 @@
             </center>
         </form>
     </div>
-    <center>
-    <a href="login.php">Voltar</a> 
-    </center>
 </body>
 </html>

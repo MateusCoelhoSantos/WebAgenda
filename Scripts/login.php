@@ -32,10 +32,6 @@ require 'conexao.php';
             <center>
                 <br>
                 <button type="submit" class="btn btn-primary">Entrar</button>
-                <br>
-                <a href="cadusu.html">Cadastrar</a>  
-                <br>
-                <a href="home.html">Voltar</a>
             </center>  
         </div>
 </body>
