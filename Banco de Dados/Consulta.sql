@@ -52,3 +52,7 @@ CREATE TABLE itensvenda(
 	precototal DOUBLE 
 );
 */
+SELECT * FROM pessoas WHERE id_pessoa = 2
+
+
+usuarios

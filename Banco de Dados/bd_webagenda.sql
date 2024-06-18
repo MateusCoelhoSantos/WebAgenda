@@ -108,12 +108,23 @@ CREATE TABLE IF NOT EXISTS `pessoas` (
   `nome` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `cpfcnpj` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `rgie` varchar(20) DEFAULT NULL,
-  `nasc` datetime DEFAULT NULL,
-  `tipopessoa` smallint DEFAULT NULL,
+  `nasc` date DEFAULT NULL,
+  `f_j` smallint DEFAULT NULL COMMENT '0-Pessoa Fisica, 1-Pessoa Juridica',
+  `tipopessoa` smallint DEFAULT NULL COMMENT '0-Usuario, 1-Cliente, 2-Medico',
+  `email` varchar(50) DEFAULT NULL,
+  `telefone` varchar(50) DEFAULT NULL,
+  `orientacaosex` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'M-Masculino, F-Feminino, N-Não Identificado',
   PRIMARY KEY (`id_pessoa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.pessoas: ~0 rows (aproximadamente)
+-- Copiando dados para a tabela webagenda.pessoas: ~6 rows (aproximadamente)
+INSERT IGNORE INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `orientacaosex`) VALUES
+	(1, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'M'),
+	(2, 'Mateus Santos', '02878024265', '0001', '2007-09-13', 0, 1, 'Mateus@gmail.com', '69992235346', 'M'),
+	(3, 'teste', '123', '123', '2024-06-18', 0, 1, 'teste@gmail.com', '123', 'F'),
+	(4, '', '', '', '2024-06-18', 0, 1, '', '', 'M'),
+	(5, 'teste2', '123321', '321123', '2024-06-18', 0, 1, 'teste2@gmail.com', '123321', 'N'),
+	(6, 'teste3', 'teste3', 'teste3', '2024-06-04', 0, 1, 'teste3', 'teste3', 'M');
 
 -- Copiando estrutura para tabela webagenda.reservas
 CREATE TABLE IF NOT EXISTS `reservas` (
@@ -142,12 +153,18 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `nome` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `senha` varchar(100) DEFAULT NULL,
+  `telefone` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
   KEY `FK_usuarios_pessoas` (`id_pessoa`),
   CONSTRAINT `FK_usuarios_pessoas` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoas` (`id_pessoa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.usuarios: ~0 rows (aproximadamente)
+-- Copiando dados para a tabela webagenda.usuarios: ~4 rows (aproximadamente)
+INSERT IGNORE INTO `usuarios` (`id_usuario`, `id_pessoa`, `nome`, `email`, `senha`, `telefone`) VALUES
+	(1, NULL, '', 'mateuscoelhosoporo@gmail.com', 'mateus13', '69992134628'),
+	(2, NULL, '', 'mateuscoelhosoporo@gmail.com', 'mateus13', '69992134628'),
+	(3, NULL, '', 'mateuscoelhosoporo@gmail.com', 'mateus13', '69992134628'),
+	(4, NULL, 'Mateus Coelho', 'mateuscoelhosoporo@gmail.com', 'mat', '69992134628');
 
 -- Copiando estrutura para tabela webagenda.venda
 CREATE TABLE IF NOT EXISTS `venda` (
