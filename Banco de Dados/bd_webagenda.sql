@@ -115,16 +115,24 @@ CREATE TABLE IF NOT EXISTS `pessoas` (
   `telefone` varchar(50) DEFAULT NULL,
   `orientacaosex` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'M-Masculino, F-Feminino, N-Não Identificado',
   PRIMARY KEY (`id_pessoa`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.pessoas: ~6 rows (aproximadamente)
 INSERT IGNORE INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `orientacaosex`) VALUES
 	(1, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'M'),
 	(2, 'Mateus Santos', '02878024265', '0001', '2007-09-13', 0, 1, 'Mateus@gmail.com', '69992235346', 'M'),
-	(3, 'teste', '123', '123', '2024-06-18', 0, 1, 'teste@gmail.com', '123', 'F'),
-	(4, '', '', '', '2024-06-18', 0, 1, '', '', 'M'),
+	(3, 'teste', '123', '123', '2004-05-07', 0, 1, 'teste@gmail.com', '123', 'M'),
+	(4, 'Atualização', 'atual', 'atualizado', '2024-06-18', 0, 1, 'atualizado@atual.com', '1231231213', 'M'),
 	(5, 'teste2', '123321', '321123', '2024-06-18', 0, 1, 'teste2@gmail.com', '123321', 'N'),
-	(6, 'teste3', 'teste3', 'teste3', '2024-06-04', 0, 1, 'teste3', 'teste3', 'M');
+	(7, 'amanda amorim', '1234', '1234', '2024-05-31', 0, 1, 'teste', '123321', 'F'),
+	(8, 'roberto renato', '123', '123', '2024-05-26', 0, 1, 'robren@hotmail.com', '431123', 'N'),
+	(9, 'jose olivas', '567765', '43232', '2024-03-05', 0, 1, 'teste', 'teste', 'N'),
+	(10, 'paulinho pereira', '1233254', '123657', '2023-09-06', 0, 1, 'pereira@paulinho.com', 'treqwe', 'M'),
+	(11, 'atestado', 'amianto', 'eutanasia', '2024-02-16', 1, 1, 'jovem', 'magaiver', 'N'),
+	(12, 'abraco', '099876543123', '123345', '2024-01-24', 1, 1, 'jovem', '123321', 'F'),
+	(13, 'amanda amorim', '1234', '1234', '2004-02-13', 1, 1, 'atualizado@atual.com', '431123', 'F'),
+	(14, 'jose olivas', '567765', '123657', '2024-05-26', 1, 1, 'jovem', '431123', 'M'),
+	(15, 'amanda amorim', '1234', '43232', '2024-04-03', 1, 1, 'atualizado@atual.com', '1231231213', 'N');
 
 -- Copiando estrutura para tabela webagenda.reservas
 CREATE TABLE IF NOT EXISTS `reservas` (
