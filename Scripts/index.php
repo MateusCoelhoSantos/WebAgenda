@@ -62,7 +62,6 @@
                 include("home.php");
                     break;
             }
-
         ?>
     </main>
 </body>

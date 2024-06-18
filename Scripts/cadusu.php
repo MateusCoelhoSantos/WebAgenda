@@ -13,10 +13,7 @@
 
 </head>
 <body>  
-    <center>
-    <h1>CADASTRO DE USUÁRIO</h1>
-    <hr>
-    </center>
+    <center><h1>CADASTRO DE USUÁRIO</h1> </center>
     <div class="container mt-5">
         <form method="post" action="insereusuario.php">
             <div class="form-group">
@@ -45,7 +42,6 @@
             </div>
             <center>
             <button type="submit" class="btn btn-primary">Cadastrar</button>
-            <br>
             </center>
         </form>
     </div>

@@ -16,23 +16,22 @@ require 'conexao.php';
     
 </head>
 <body>
-    <center> 
-        <h1>LOGIN</h1> 
-        <hr>
-    </center>
+    <center><h1>LOGIN</h1></center>
         <div class="container mt-5">
-            <div class="form-group">
-                <label for="usuario">Usuário:</label>
-                <input type="text" class="form-control" id="usuario" name="usuario">
-            </div>
-            <div class="form-group">
-                <label for="senha">Senha:</label>
-                <input type="password" class="form-control" id="senha" name="senha"> 
-            </div>
-            <center>
-                <br>
-                <button type="submit" class="btn btn-primary">Entrar</button>
-            </center>  
+            <form method="post" action="agenda.php">
+                <div class="form-group">
+                    <label for="usuario">Usuário:</label>
+                    <input type="text" class="form-control" id="usuario" name="usuario">
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha:</label>
+                    <input type="password" class="form-control" id="senha" name="senha"> 
+                </div>
+                <center>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </center> 
+            </form> 
         </div>
 </body>
 </html>
