@@ -38,7 +38,7 @@ $dados = mysqli_fetch_assoc($rs);
 </head>
 
 <Header>
-    <h3>Editar Cliente</h3>
+    <center><h3>Editar Cliente</h3></center>
 </Header>
 <div class="container mt-3">
     <form action="agenda.php?menuop=atualizarcliente" method="post">

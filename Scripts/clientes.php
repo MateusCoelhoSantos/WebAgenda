@@ -27,7 +27,7 @@
     </style>
 </head>
 <header>
-    <h3>Clientes</h3>
+    <center><h3>Clientes</h3></center>
 </header>
 <div>
     <a href="agenda.php?menuop=cadastrocliente">Novo Cliente</a>
@@ -62,6 +62,8 @@
 
         $pagina = (isset($_GET['pagina']))?(int)$_GET['pagina']:1;
 
+        $inicio = ($quantidade * $pagina) - $quantidade;
+
         $pesquisa = (isset($_POST["pesquisa"]))?$_POST["pesquisa"]:"";
 
         $sql = "SELECT *, UPPER(nome) as nome, LOWER(email) AS email,
@@ -76,8 +78,9 @@
                     END AS 'orientacao',
                 DATE_FORMAT (nasc,'%d/%m/%Y') as nasc
                 FROM pessoas
-                WHERE tipopessoa = 1 AND id_pessoa = '{$pesquisa}' OR nome like '%{$pesquisa}%'
+                WHERE tipopessoa = 1 AND id_pessoa = '{$pesquisa}' OR nome LIKE '%{$pesquisa}%'
                 ORDER BY id_pessoa
+                LIMIT $inicio , $quantidade
                 ";
         $RS = mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
 
@@ -103,8 +106,43 @@
         } else {
             echo "Nenhum Cliente cadastrado.";    
         }
-        
         ?>
 
     </tbody>
 </table>
+<br>
+<?php
+$sqltotal = "SELECT id_pessoa FROM pessoas";
+$qrtotal = mysqli_query($conexao,$sqltotal) or die(mysqli_error($conexao));
+$numtotal = mysqli_num_rows($qrtotal);
+$totalpagina = ceil($numtotal/$quantidade); 
+echo "Total de Registros: $numtotal <br>";
+echo '<a href="?menuop=clientes&pagina=1">Primeira Pagina</a>';
+
+if ($pagina>6) {
+    ?>
+        <a href="?menuop=clientes&pagina=<?php echo $pagina-1?>"> << </a>
+    <?php
+}
+
+for ($i=1; $i <=$totalpagina; $i++) { 
+    
+    if ($i>=($pagina-5) && $i <= ($pagina+5)) {
+        if ($i==$pagina) {
+            echo $i;
+        } else {
+            echo "<a href=\"?menuop=clientes&pagina=$i\">$i</a> ";
+        }
+    }
+}
+
+if ($pagina< ($totalpagina-5)) {
+    ?>
+        <a href="?menuop=clientes&pagina=<?php echo $pagina+1?>"> >> </a>
+    <?php
+}
+
+
+echo "<a href=\"?menuop=clientes&pagina=$totalpagina\">Ultima Pagina</a>";
+
+?>

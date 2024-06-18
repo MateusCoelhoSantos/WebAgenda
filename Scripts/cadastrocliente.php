@@ -28,7 +28,7 @@
 </head>
 
 <Header>
-    <h3>Cadastro de Clientes</h3>
+    <center><h3>Cadastro de Clientes</h3></center>
 </Header>
 <div class="container mt-3">
     <form action="agenda.php?menuop=inserecliente" method="post">
