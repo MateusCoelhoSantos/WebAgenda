@@ -32,6 +32,13 @@
 <div>
     <a href="agenda.php?menuop=cadastrocliente">Novo Cliente</a>
 </div>
+<div>
+    <form action="agenda.php?menuop=clientes" method="post">
+        <input type="text" name="pesquisa">
+        <input type="submit" value="Pesquisar">
+    </form>
+    <br>
+</div>
 <table>
     <thead>
         <tr>
@@ -45,10 +52,18 @@
             <th>Telefone</th>
             <th>Sexo</th>
             <th>Alterar</th>
+            <th>Excluir</th>
         </tr>
     </thead>
     <tbody>
         <?php
+
+        $quantidade = 10;
+
+        $pagina = (isset($_GET['pagina']))?(int)$_GET['pagina']:1;
+
+        $pesquisa = (isset($_POST["pesquisa"]))?$_POST["pesquisa"]:"";
+
         $sql = "SELECT *, UPPER(nome) as nome, LOWER(email) AS email,
                 CASE 
                     WHEN f_j = 0 THEN 'Pessoa Fisica' 
@@ -61,7 +76,9 @@
                     END AS 'orientacao',
                 DATE_FORMAT (nasc,'%d/%m/%Y') as nasc
                 FROM pessoas
-                WHERE tipopessoa = 1";
+                WHERE tipopessoa = 1 AND id_pessoa = '{$pesquisa}' OR nome like '%{$pesquisa}%'
+                ORDER BY id_pessoa
+                ";
         $RS = mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
 
         if (mysqli_num_rows($RS) > 0) {
@@ -79,6 +96,7 @@
             <td><?=$dados["telefone"] ?></td>
             <td><?=$dados["orientacao"] ?></td>
             <td><a href="agenda.php?menuop=editarcliente&idcli=<?=$dados["id_pessoa"] ?>">Alterar</a></td>
+            <td><a href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>">Excluir</a></td>
         </tr>
     <?php
         }

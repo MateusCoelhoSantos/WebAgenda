@@ -71,7 +71,10 @@
                     break;
                 case 'atualizarcliente':
                     include("atualizarcliente.php");
-                    break;                    
+                    break;  
+                case 'excluircliente':
+                    include("excluircliente.php");
+                    break;                   
                 default:
                 include("agendamento.php");
                     break;

@@ -28,8 +28,8 @@
             margin: 20px;
         }
         img {
-          float: left; /* Faz a imagem flutuar à esquerda do texto */
-          margin-right: 5px; /* Adiciona espaço entre a imagem e o texto */
+          float: left; 
+          margin-right: 5px; 
         }
 
     </style>

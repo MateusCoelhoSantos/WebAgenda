@@ -80,11 +80,11 @@ $dados = mysqli_fetch_assoc($rs);
         <fieldset class="form-group">
             <legend class="col-form-label pt-0">Tipo Pessoa:</legend>
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="pessoafisica" name="clitipo" value="0" >
+                <input class="form-check-input" type="radio" id="pessoafisica" name="clitipo" value="0" required>
                 <label class="form-check-label" for="pessoafisica">Pessoa Fisica</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="pessoajuridica" name="clitipo" value="1">
+                <input class="form-check-input" type="radio" id="pessoajuridica" name="clitipo" value="1" required>
                 <label class="form-check-label" for="pessoajuridica">Pessoa Juridica</label>
             </div>
         </fieldset>
@@ -92,32 +92,20 @@ $dados = mysqli_fetch_assoc($rs);
         <fieldset class="form-group2">
             <legend class="col-form-label pt-0">Orientação Sexual:</legend>
             <div class="form-check">
-                <? if ($dados["orientacaosex"] = 'M') {?>
-                <input class="form-check-input" type="radio" id="masculino" name="cliorientacao" value="M" checked>
-                <?}else {?>
-                <input class="form-check-input" type="radio" id="masculino" name="cliorientacao" value="M" >
-                <?}?>
+                <input class="form-check-input" type="radio" id="masculino" name="cliorientacao" value="M" required>
                 <label class="form-check-label" for="masculino">Masculino</label>
             </div>
             <div class="form-check">
-                <? if ($dados["orientacaosex"] = 'F') {?>
-                <input class="form-check-input" type="radio" id="feninino" name="cliorientacao" value="F" checked>
-                <?}else {?>
-                <input class="form-check-input" type="radio" id="feninino" name="cliorientacao" value="F">
-                <?}?>
+                <input class="form-check-input" type="radio" id="feninino" name="cliorientacao" value="F" required>
                 <label class="form-check-label" for="feninino">Feminino</label>
             </div>
             <div class="form-check">
-                <? if ($dados["orientacaosex"] = 'N') {?>
-                <input class="form-check-input" type="radio" id="naoidentificado" name="cliorientacao" value="N" checked>
-                <?}else {?>
-                <input class="form-check-input" type="radio" id="naoidentificado" name="cliorientacao" value="N">
-                <?}?>
+                <input class="form-check-input" type="radio" id="naoidentificado" name="cliorientacao" value="N" required>
                 <label class="form-check-label" for="naoidentificado">Não Identificado</label>
             </div>
         </fieldset>
         <div class ="botao">
-            <input type="submit" value="Atualizar" nome="atualizar">
+            <input type="submit" value="atualizar" nome="atualizar">
         </div>
     </form>
 </div>
