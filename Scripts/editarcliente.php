@@ -90,7 +90,7 @@ $dados = mysqli_fetch_assoc($rs);
         </fieldset>
 
         <fieldset class="form-group2">
-            <legend class="col-form-label pt-0">Orientação Sexual:</legend>
+            <legend class="col-form-label pt-0">Sexo:</legend>
             <div class="form-check">
                 <input class="form-check-input" type="radio" id="masculino" name="cliorientacao" value="M" required>
                 <label class="form-check-label" for="masculino">Masculino</label>

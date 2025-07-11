@@ -38,13 +38,13 @@
 <body>
     <header>
         <center>
-            <h1>AGENDAMENTOS</h1>
+            <h1>WEBAGENDA</h1>
             <nav>
                 <a href="agenda.php?menuop=agendamento"><button type="submit" class="btn btn-primary">Agendamento</button></a>
                 <a href="agenda.php?menuop=clientes"><button type="submit" class="btn btn-primary">Clientes</button></a>
                 <a href="agenda.php?menuop=quartos"><button type="submit" class="btn btn-primary">Quartos</button></a>
                 <a href="index.php"><button type="submit" class="btn btn-primary">sair</button></a>
-             </nav>
+            </nav>
         </center>
     </header>
     <main>  

@@ -10,7 +10,7 @@
     >
 
     <style>
-        table {
+        /* table {
             width: 100%;
             border-collapse: collapse;
         }
@@ -23,24 +23,41 @@
         }
         th {
             background-color: #f2f2f2;
+        } */
+        .row{
+            display: flex;
         }
+        .newcli{
+            display: flex; 
+        }
+        .pesquisa{
+            display: flex;
+            margin-right: 705px; 
+            margin-left: 15px;   
+        }
+        
     </style>
 </head>
 <header>
     <center><h3>Clientes</h3></center>
 </header>
-<div>
-    <a href="agenda.php?menuop=cadastrocliente">Novo Cliente</a>
-</div>
-<div>
-    <form action="agenda.php?menuop=clientes" method="post">
-        <input type="text" name="pesquisa">
-        <input type="submit" value="Pesquisar">
-    </form>
-    <br>
-</div>
-<table>
-    <thead>
+<div class="container">
+    <div class="row">
+        <div class="pesquisa">
+            <form action="agenda.php?menuop=clientes" method="post">
+                <input type="text" name="pesquisa">
+                <input class="btn btn-success" type="submit" value="Pesquisar">
+            </form>
+            <br>
+        </div>
+        <div class="newcli">
+            <a href="agenda.php?menuop=cadastrocliente" class="btn btn-success">Novo Cliente</a>
+        </div>
+    </div>
+
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
         <tr>
             <th>ID</th>
             <th>Nome</th>
@@ -55,7 +72,7 @@
             <th>Excluir</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="bg-light">
         <?php
 
         $quantidade = 10;
@@ -110,6 +127,8 @@
 
     </tbody>
 </table>
+</div>
+
 <br>
 <?php
 $sqltotal = "SELECT id_pessoa FROM pessoas";
