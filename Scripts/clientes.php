@@ -3,11 +3,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clientes</title>
 
-    <link rel="stylesheet"
+    <!-- <link rel="stylesheet"
         href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous"
-    >
+    > -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         /* table {
@@ -26,31 +27,40 @@
         } */
         .row{
             display: flex;
+            margin-top: 25px;
+            margin-bottom: 25px;
         }
-        .newcli{
-            display: flex; 
+        .row .pesquisa{
+            width: 1150px;  
+            margin-left: auto;  
         }
-        .pesquisa{
+        .row .novocli{
+            width: 100px;
+            margin-right: auto;
+        }
+        .form{
             display: flex;
-            margin-right: 705px; 
-            margin-left: 15px;   
         }
-        
+        .form-control{
+            margin-right: 10px;
+            width: 200px;
+        }
+
     </style>
 </head>
 <header>
     <center><h3>Clientes</h3></center>
 </header>
-<div class="container">
+<body class="bg-light">
+<div class="container mt-5">
     <div class="row">
         <div class="pesquisa">
-            <form action="agenda.php?menuop=clientes" method="post">
-                <input type="text" name="pesquisa">
+            <form class="form" action="agenda.php?menuop=clientes" method="post">
+                <input class="form-control" type="text" name="pesquisa"> 
                 <input class="btn btn-success" type="submit" value="Pesquisar">
             </form>
-            <br>
-        </div>
-        <div class="newcli">
+        </div>  
+        <div class="novocli">
             <a href="agenda.php?menuop=cadastrocliente" class="btn btn-success">Novo Cliente</a>
         </div>
     </div>
@@ -75,7 +85,7 @@
     <tbody class="bg-light">
         <?php
 
-        $quantidade = 10;
+        $quantidade = 20;
 
         $pagina = (isset($_GET['pagina']))?(int)$_GET['pagina']:1;
 
@@ -165,3 +175,4 @@ if ($pagina< ($totalpagina-5)) {
 echo "<a href=\"?menuop=clientes&pagina=$totalpagina\">Ultima Pagina</a>";
 
 ?>
+</body>

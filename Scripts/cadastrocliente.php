@@ -24,6 +24,13 @@
             margin-top: 25px;
             margin-left: 1025px;   
         }
+        /* .container mt-3{
+            display: flex;
+            width: 100vw;
+            height: 100px;
+            justify-content: center;
+            align-items: center;
+        } */
     </style>
 </head>
 
@@ -90,7 +97,7 @@
             </div>
         </fieldset>
         <div class ="botao">
-            <input type="submit" value="incluir" nome="incluir">
+            <input class="btn btn-success" type="submit" value="incluir" nome="incluir">
         </div>
     </form>
 </div>

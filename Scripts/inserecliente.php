@@ -1,6 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inserindo cliente</title>
+
+    <style>
+        .container{
+            display: flex;
+            width: 100vw;
+            height: 100px;
+            justify-content: center;
+            align-items: center;
+        }
+        .voltar{
+            margin-right: 50px;
+        }
+    </style>
+</head>
 <header>
-    <h3>Cliente Inserido</h3>
+    <center><h3>Cliente Inserido</h3></center>
 </header>
+<body>
+
 <?php
 
     $clinome = mysqli_real_escape_string($conexao,$_POST["clinome"]);
@@ -31,10 +53,20 @@
             '{$clitel}',
             '{$clitipo}',
             '{$cliorientacao}',
-            1
-            )";
+            1)";
             mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
 
-            echo "O Registro Foi Inserido Com Sucesso!";
+            echo " <center> O Registro Foi Inserido Com Sucesso! </center>";
 
 ?>
+<div class="container">
+    <div class="voltar">
+        <center><a href="agenda.php?menuop=cadastrocliente"><button type="submit" class="btn btn-success">Voltar</button></a></center>
+    </div>
+    <div class="listagem">
+        <center><a href="agenda.php?menuop=clientes"><button type="submit" class="btn btn-success">Listagem</button></a></center>   
+    </div>
+</div>
+
+</body>
+</html>

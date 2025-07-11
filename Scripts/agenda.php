@@ -63,8 +63,14 @@
                 case 'cadastrocliente':
                     include("cadastrocliente.php");
                     break;
+                case 'cadastroquarto':
+                    include("cadastroquarto.php");
+                    break;
                 case 'inserecliente':
                     include("inserecliente.php");
+                    break;
+                case 'inserequarto':
+                    include("inserequarto.php");
                     break;
                 case 'editarcliente':
                     include("editarcliente.php");

@@ -12,7 +12,7 @@
 <body class="bg-light">
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="incluir_quarto.php" class="btn btn-success">Incluir Quarto</a>
+        <a href="agenda.php?menuop=cadastroquarto"><button type="submit" class="btn btn-success">Incluir Quarto</button></a>
     </div>
 
     <table class="table table-striped table-hover">
