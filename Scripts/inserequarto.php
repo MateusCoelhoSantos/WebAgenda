@@ -37,7 +37,7 @@
         0)";
         mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
 
-        echo " <center> O Registro Foi Inserido Com Sucesso! </center>";
+        echo "<center> O Registro Foi Inserido Com Sucesso!</center>";
     ?>
 <div class="container">
     <div class="voltar">

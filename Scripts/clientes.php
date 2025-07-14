@@ -31,19 +31,20 @@
             margin-bottom: 25px;
         }
         .row .pesquisa{
-            width: 1150px;  
-            margin-left: auto;  
+            width: 89%;
         }
         .row .novocli{
-            width: 100px;
-            margin-right: auto;
+            width: 11%;
+        }
+        .a{
+            margin-trim: all;
         }
         .form{
             display: flex;
         }
         .form-control{
             margin-right: 10px;
-            width: 200px;
+            width: 250px;
         }
 
     </style>
@@ -64,7 +65,6 @@
             <a href="agenda.php?menuop=cadastrocliente" class="btn btn-success">Novo Cliente</a>
         </div>
     </div>
-
 
 <table class="table table-striped table-hover">
     <thead class="table-dark">
@@ -105,7 +105,7 @@
                     END AS 'orientacao',
                 DATE_FORMAT (nasc,'%d/%m/%Y') as nasc
                 FROM pessoas
-                WHERE tipopessoa = 1 AND id_pessoa = '{$pesquisa}' OR nome LIKE '%{$pesquisa}%'
+                WHERE tipopessoa = 1 AND excluido <> 1 and id_pessoa = '{$pesquisa}' OR nome LIKE '%{$pesquisa}%'
                 ORDER BY id_pessoa
                 LIMIT $inicio , $quantidade
                 ";
@@ -125,8 +125,8 @@
             <td><?=$dados["email"] ?></td>
             <td><?=$dados["telefone"] ?></td>
             <td><?=$dados["orientacao"] ?></td>
-            <td><a href="agenda.php?menuop=editarcliente&idcli=<?=$dados["id_pessoa"] ?>">Alterar</a></td>
-            <td><a href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>">Excluir</a></td>
+            <td><a href="agenda.php?menuop=editarcliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-primary">Alterar</a></td>
+            <td><a href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-danger">Excluir</a></td>
         </tr>
     <?php
         }
@@ -175,4 +175,5 @@ if ($pagina< ($totalpagina-5)) {
 echo "<a href=\"?menuop=clientes&pagina=$totalpagina\">Ultima Pagina</a>";
 
 ?>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>

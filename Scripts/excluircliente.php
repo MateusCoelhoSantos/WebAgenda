@@ -22,7 +22,7 @@
  
 <?php
     $idcli = mysqli_real_escape_string($conexao,$_GET["idcli"]);
-    $sql = "DELETE FROM pessoas WHERE id_pessoa = '{$idcli}'";
+    $sql = "update pessoas set excluido = 1 WHERE id_pessoa = '{$idcli}'";
 
     mysqli_query($conexao,$sql) or die("Erro ao Exluir o Registro! " . mysqli_error($conexao)); 
     echo "<center>Registro Excluido com Sucesso!</center>";

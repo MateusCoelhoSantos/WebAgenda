@@ -37,7 +37,7 @@
         <form action="agenda.php?menuop=inserequarto" method="post">
             <div>
                 <label for="numquarto">Número do Quarto</label>
-                <input type="text"  class="form-control" name="numquarto" required>
+                <input type="number"  class="form-control" name="numquarto" required>
             </div>
             
             <div>
