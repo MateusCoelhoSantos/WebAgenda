@@ -62,7 +62,7 @@
             </form>
         </div>  
         <div class="novocli">
-            <a href="agenda.php?menuop=cadastrocliente" class="btn btn-success">Novo Cliente</a>
+            <a href="agenda.php?menuop=cadastrocliente" class="btn btn-success">Incluir Cliente</a>
         </div>
     </div>
 
@@ -78,8 +78,7 @@
             <th>E-mail</th>
             <th>Telefone</th>
             <th>Sexo</th>
-            <th>Alterar</th>
-            <th>Excluir</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody class="bg-light">
@@ -105,7 +104,7 @@
                     END AS 'orientacao',
                 DATE_FORMAT (nasc,'%d/%m/%Y') as nasc
                 FROM pessoas
-                WHERE tipopessoa = 1 AND excluido <> 1 and id_pessoa = '{$pesquisa}' OR nome LIKE '%{$pesquisa}%'
+                WHERE (excluido <> 1) AND tipopessoa = 1 AND (id_pessoa = '{$pesquisa}' OR nome LIKE '%{$pesquisa}%')
                 ORDER BY id_pessoa
                 LIMIT $inicio , $quantidade
                 ";
@@ -125,8 +124,8 @@
             <td><?=$dados["email"] ?></td>
             <td><?=$dados["telefone"] ?></td>
             <td><?=$dados["orientacao"] ?></td>
-            <td><a href="agenda.php?menuop=editarcliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-primary">Alterar</a></td>
-            <td><a href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-danger">Excluir</a></td>
+            <td><a href="agenda.php?menuop=editarcliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-primary">Alterar</a>
+            <a href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-danger">Excluir</a></td>
         </tr>
     <?php
         }

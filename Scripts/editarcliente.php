@@ -21,6 +21,10 @@ $dados = mysqli_fetch_assoc($rs);
         crossorigin="anonymous"
     >
     <style>
+        .container{
+            margin-top: 15px;
+            margin-bottom: 100px;
+        }
         .form-group{
             float: left;
             margin-top: 25px;
@@ -32,7 +36,7 @@ $dados = mysqli_fetch_assoc($rs);
         }
         .botao{
             margin-top: 25px;
-            margin-left: 1025px;   
+            margin-left: 1025px;  
         }
     </style>
 </head>
@@ -40,7 +44,7 @@ $dados = mysqli_fetch_assoc($rs);
 <Header>
     <center><h3>Editar Cliente</h3></center>
 </Header>
-<div class="container mt-3">
+<div class="container">
     <form action="agenda.php?menuop=atualizarcliente" method="post">
         <div>
             <label for="cliid">ID</label>
@@ -80,11 +84,11 @@ $dados = mysqli_fetch_assoc($rs);
         <fieldset class="form-group">
             <legend class="col-form-label pt-0">Tipo Pessoa:</legend>
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="pessoafisica" name="clitipo" value="0" required>
+                <input class="form-check-input" type="radio" id="pessoafisica" name="clitipo" value="0" <?php if ($dados["f_j"] == 0) echo 'checked'; ?> required>
                 <label class="form-check-label" for="pessoafisica">Pessoa Fisica</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="pessoajuridica" name="clitipo" value="1" required>
+                <input class="form-check-input" type="radio" id="pessoajuridica" name="clitipo" value="1" <?php if ($dados["f_j"] == 1) echo 'checked'; ?> required>
                 <label class="form-check-label" for="pessoajuridica">Pessoa Juridica</label>
             </div>
         </fieldset>
@@ -92,20 +96,20 @@ $dados = mysqli_fetch_assoc($rs);
         <fieldset class="form-group2">
             <legend class="col-form-label pt-0">Sexo:</legend>
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="masculino" name="cliorientacao" value="M" required>
+                <input class="form-check-input" type="radio" id="masculino" name="cliorientacao" value="M" <?php if ($dados["orientacaosex"] == "M") echo 'checked'; ?> required>
                 <label class="form-check-label" for="masculino">Masculino</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="feninino" name="cliorientacao" value="F" required>
+                <input class="form-check-input" type="radio" id="feninino" name="cliorientacao" value="F" <?php if ($dados["orientacaosex"] == "F") echo 'checked'; ?> required>
                 <label class="form-check-label" for="feninino">Feminino</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="naoidentificado" name="cliorientacao" value="N" required>
+                <input class="form-check-input" type="radio" id="naoidentificado" name="cliorientacao" value="N" <?php if ($dados["orientacaosex"] == "N") echo 'checked'; ?> required>
                 <label class="form-check-label" for="naoidentificado">Não Identificado</label>
             </div>
         </fieldset>
         <div class ="botao">
-            <input type="submit" value="atualizar" nome="atualizar">
+            <input type="submit" class="btn btn-success" value="atualizar" nome="atualizar">
         </div>
     </form>
 </div>

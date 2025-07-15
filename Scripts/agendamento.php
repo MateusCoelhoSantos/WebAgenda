@@ -13,9 +13,6 @@
             justify-content: center;
             align-items: center;
         }
-            .container .box{
-                
-            }
     </style>
 </head>
 <header>
@@ -23,10 +20,8 @@
 </header>
 <body>
     <div class="container">
-        <div class="box">
-         <h3>TESTE de AGENDAMENTO</h3>   
-        </div>
+        
     </div>
-    
+
 </body>
 </html>

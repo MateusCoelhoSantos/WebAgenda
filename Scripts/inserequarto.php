@@ -30,10 +30,12 @@
         $sql = "INSERT INTO  quartos (
         num_quarto,
         descricao,
-        status)
+        status,
+        excluido)
         VALUES (
         '{$numquarto}',
         '{$descricao}',
+        0,
         0)";
         mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
 

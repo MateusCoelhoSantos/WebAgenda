@@ -43,7 +43,8 @@
             telefone,
             f_j,
             orientacaosex,
-            tipopessoa) 
+            tipopessoa,
+            excluido) 
             VALUES (
             '{$clinome}',
             '{$clicpfcnpj}',
@@ -53,7 +54,8 @@
             '{$clitel}',
             '{$clitipo}',
             '{$cliorientacao}',
-            1)";
+            1,
+            0)";
             mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
 
             echo " <center> O Registro Foi Inserido Com Sucesso! </center>";

@@ -72,7 +72,7 @@
         <fieldset class="form-group">
             <legend class="col-form-label pt-0">Tipo Pessoa:</legend>
             <div class="form-check">
-                <input class="form-check-input" type="radio" id="pessoafisica" name="clitipo" value="0" >
+                <input class="form-check-input" type="radio" id="pessoafisica" name="clitipo" value="0">
                 <label class="form-check-label" for="pessoafisica">Pessoa Fisica</label>
             </div>
             <div class="form-check">

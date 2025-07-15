@@ -1,6 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualizando cliente</title>
+
+    <style>
+        .container{
+            display: flex;
+            width: 100vw;
+            height: 100px;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
 <header>
-    <h3>Cliente Atualizado</h3>
+    <center><h3>Cliente Atualizado</h3></center>
 </header>
+<body>
+
 <?php
 
     $idcli = mysqli_real_escape_string($conexao,$_POST["cliid"]);
@@ -26,6 +45,14 @@
             ";
             mysqli_query($conexao,$sql) or die("Erro ao Executar a Atualização! " . mysqli_error($conexao));
 
-            echo "O Registro Foi Atualizado Com Sucesso!";
+            echo "<center>O Registro Foi Atualizado Com Sucesso!</center>";
 
 ?>
+<div class="container">
+    <div class="listagem">
+        <center><a href="agenda.php?menuop=clientes"><button type="submit" class="btn btn-success">Voltar</button></a></center>   
+    </div>
+</div>
+
+</body>
+</html>
