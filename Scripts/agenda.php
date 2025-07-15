@@ -75,6 +75,12 @@
                 case 'editarcliente':
                     include("editarcliente.php");
                     break;
+                case 'editarquarto':
+                    include("editarquarto.php");
+                    break;
+                case 'excluirquarto':
+                    include("excluirquarto.php");
+                    break;
                 case 'atualizarcliente':
                     include("atualizarcliente.php");
                     break;  
