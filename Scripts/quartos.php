@@ -86,8 +86,8 @@
                     echo "<td>" . $dados['descricao'] . "</td>";
                     echo "<td>" . $dados['status'] . "</td>";
                     echo "<td>
-                        <a href='agenda.php?menuop=editarquarto&idcli=" . $dados['id_quarto'] . "' class='btn btn-primary btn-sm me-1'>Alterar</a>
-                        <a href='agenda.php?menuop=excluirquarto&idcli=" . $dados['id_quarto'] . "' class='btn btn-danger btn-sm' onclick='return confirm(Deseja realmente excluir?)'>Excluir</a>
+                        <a href='agenda.php?menuop=editarquarto&idquarto=" . $dados['id_quarto'] . "' class='btn btn-primary btn-sm me-1'>Alterar</a>
+                        <a href='agenda.php?menuop=excluirquarto&idquarto=" . $dados['id_quarto'] . "' class='btn btn-danger btn-sm' onclick='return confirm(Deseja realmente excluir?)'>Excluir</a>
                     </td>";
                     echo "</tr>";
                 }

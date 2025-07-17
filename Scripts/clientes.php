@@ -125,7 +125,7 @@
             <td><?=$dados["telefone"] ?></td>
             <td><?=$dados["orientacao"] ?></td>
             <td><a href="agenda.php?menuop=editarcliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-primary">Alterar</a>
-            <a href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-danger">Excluir</a></td>
+                <a href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-danger">Excluir</a></td>
         </tr>
     <?php
         }

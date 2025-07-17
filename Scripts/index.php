@@ -39,7 +39,7 @@
 </head>
 <body>
     <header>
-        <img src="LogoWebAgenda.png" width="120" height="120"> 
+        <img src="\Imagens\LogoWebAgenda.png" width="120" height="120"> 
         <br>
         <b><h1>WebAgenda</h1></b>
         <nav>

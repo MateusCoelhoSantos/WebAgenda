@@ -1,5 +1,5 @@
 <?php
-$idquarto = isset($_GET["id_quarto"]) ? $_GET["id_quarto"] : null;
+$idquarto = isset($_GET["idquarto"]) ? $_GET["idquarto"] : null;
 if ($idquarto === null) {
     die("ID do Quarto não foi fornecido.");
 }
@@ -22,6 +22,10 @@ $dados = mysqli_fetch_assoc($rs);
     >
 
     <style>
+        .container{
+            margin-top: 15px;
+            margin-bottom: 100px;
+        }
         .botao{
             margin-top: 25px;
             margin-left: 1025px; 
@@ -38,27 +42,30 @@ $dados = mysqli_fetch_assoc($rs);
 
 </head>
 <header>
-    <center><h3>Cadastro de Quarto</h3></center>
+    <center><h3>Editar Quarto</h3></center>
 </header>
 <body>
 
 <div class="container">
-    <div class="container mt-3">
-        <form action="agenda.php?menuop=inserequarto" method="post">
-            <div>
-                <label for="numquarto">Número do Quarto</label>
-                <input type="number"  class="form-control" name="numquarto" required>
-            </div>
-            
-            <div>
-                <label for="descricao">Descrição</label>
-                <input type="text" class="form-control" name="descricao" required>
-            </div>
-            <div class ="botao">
-                <input class="btn btn-success" type="submit" value="incluir" nome="incluir">
-            </div>
-        </form>
-    </div>   
+    <form action="agenda.php?menuop=inserequarto" method="post">
+        <div>
+            <label for="numquarto">ID</label>
+            <input type="number"  class="form-control" name="idquarto" value="<?=$dados["id_quarto"]?>" required>
+        </div>
+
+        <div>
+            <label for="numquarto">Número do Quarto</label>
+            <input type="number"  class="form-control" name="numquarto" value="<?=$dados["num_quarto"]?>" required>
+        </div>
+        
+        <div>
+            <label for="descricao">Descrição</label>
+            <input type="text" class="form-control" name="descricao"  value="<?=$dados["descricao"]?>" required>
+        </div>
+        <div class ="botao">
+            <input type="submit" class="btn btn-success" value="atualizar" nome="atualizar">
+        </div>
+    </form>
 </div>
     
 </body>

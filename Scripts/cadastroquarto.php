@@ -12,9 +12,13 @@
     >
 
     <style>
+        .container{
+            margin-top: 15px;
+            margin-bottom: 100px;
+        }
         .botao{
             margin-top: 25px;
-            margin-left: 1025px; 
+            margin-left: 94%; 
             margin-bottom: 50px;  
         }
         /* .container{
@@ -33,22 +37,20 @@
 <body>
 
 <div class="container">
-    <div class="container mt-3">
-        <form action="agenda.php?menuop=inserequarto" method="post">
-            <div>
-                <label for="numquarto">Número do Quarto</label>
-                <input type="number"  class="form-control" name="numquarto" required>
-            </div>
-            
-            <div>
-                <label for="descricao">Descrição</label>
-                <input type="text" class="form-control" name="descricao" required>
-            </div>
-            <div class ="botao">
-                <input class="btn btn-success" type="submit" value="incluir" nome="incluir">
-            </div>
-        </form>
-    </div>   
+    <form action="agenda.php?menuop=inserequarto" method="post">
+        <div>
+            <label for="numquarto">Número do Quarto</label>
+            <input type="number"  class="form-control" name="numquarto" required>
+        </div>
+        
+        <div>
+            <label for="descricao">Descrição</label>
+            <input type="text" class="form-control" name="descricao" required>
+        </div>
+        <div class ="botao">
+            <input class="btn btn-success" type="submit" value="incluir" nome="incluir">
+        </div>
+    </form>
 </div>
     
 </body>
