@@ -72,6 +72,7 @@
                     END as status
                     FROM quartos
                     WHERE excluido <> 1 and (num_quarto = '{$pesquisa}' OR descricao LIKE '%{$pesquisa}%')
+                    WHERE excluido = 0 and num_quarto = '{$pesquisa}' OR descricao LIKE '%{$pesquisa}%'
                     ORDER BY id_quarto
                     LIMIT $inicio , $quantidade
                     ";
