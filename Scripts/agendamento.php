@@ -7,12 +7,26 @@
     <title>Agendamentos</title>
 
     <style>
-        .container{
+        .row{
             display: flex;
-            width: 100vw;
-            height: 100px;
-            justify-content: center;
-            align-items: center;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+        .row .pesquisa{
+            width: 89%;
+        }
+        .row .novo{
+            width: 11%;
+        }
+        .a{
+            margin-trim: all;
+        }
+        .form{
+            display: flex;
+        }
+        .form-control{
+            margin-right: 10px;
+            width: 250px;
         }
     </style>
 </head>
@@ -21,15 +35,56 @@
 </header>
 <body>
     <div class="container">
+        <div class="row">
+            <div class="pesquisa">
+                <form class="form" action="agenda.php?menuop=agendamento" method="post">
+                    <input class="form-control" type="text" name="pesquisa"> 
+                    <input class="btn btn-success" type="submit" value="Pesquisar">
+                </form>
+            </div>  
+            <div class="novo">
+                <a href="agenda.php?menuop=cadastrocliente" class="btn btn-success">Incluir Cliente</a>
+            </div>
+        </div>
     <table class="table table-bordered table-hover">
         <thead class="table-light">
             <tr>
-                <th>Nome</th>
-                <th>Email</th>
+                <th>Cliente</th>
+                <th>Quarto</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
             <?php 
+
+            ini_set('display_errors', 1);
+            error_reporting(E_ALL);
+
+            function formatarTelefone($telefone) {
+                $telefone = preg_replace('/\D/', '', $telefone);
+                if (strlen($telefone) === 11) {
+                    return preg_replace('/^(\d{2})(\d{1})(\d{4})(\d{4})$/', '($1) $2 $3-$4', $telefone);
+                } else {
+                    return $telefone; // Se não for 11 dígitos, retorna como está
+                }
+            }
+
+            function formatarCpfCnpj($numero) {
+                // Remove tudo que não for número
+                $numero = preg_replace('/\D/', '', $numero);
+
+                if (strlen($numero) === 11) {
+                    // Formatar CPF: 000.000.000-00
+                    return preg_replace('/^(\d{3})(\d{3})(\d{3})(\d{2})$/', '$1.$2.$3-$4', $numero);
+                } elseif (strlen($numero) === 14) {
+                    // Formatar CNPJ: 00.000.000/0000-00
+                    return preg_replace('/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/', '$1.$2.$3/$4-$5', $numero);
+                } else {
+                    // Número inválido
+                    return $numero;
+                }
+            }
+
             $quantidade = 20;
 
             $pagina = (isset($_GET['pagina']))?(int)$_GET['pagina']:1;
@@ -38,18 +93,52 @@
 
             $pesquisa = (isset($_POST["pesquisa"]))?$_POST["pesquisa"]:"";
             
-            $sql = "select r.id_reserva, r.valor as valor, r.finalizado, p.id_pessoa, p.nome as nome, p.email as email, p.telefone as telefone from reservas r inner join pessoas p on r.id_pessoa = p.id_pessoa";
+            $sql = "SELECT 
+                        *
+                    FROM 
+                        reservas r 
+                    INNER JOIN
+                        pessoas p 
+                    ON 
+                        r.id_pessoa = p.id_pessoa 
+                    INNER JOIN
+                        quartos q 
+                    ON 
+                        r.id_quarto = q.id_quarto
+                    ORDER BY id_reserva
+                    LIMIT $inicio , $quantidade";
+
             $dados = mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
-            foreach ($dados as $reserva): ?>
+            foreach ($dados as $reserva): 
+            ?>
                 <tr data-bs-toggle="collapse" data-bs-target="#detalhes<?= $reserva['id_reserva'] ?>" class="cursor-pointer">
                     <td><?= $reserva['nome'] ?></td>
-                    <td><?= $reserva['email'] ?></td>
+                    <td><?= $reserva['num_quarto'] .' - '. $reserva['descricao'] ?></td>
+                    <td><a href="agenda.php?menuop=editaragendamento&idreserva=<?=$reserva["id_reserva"] ?>" class="btn btn-primary">Alterar</a>
+                <a href="agenda.php?menuop=excluiragendamento&idreserva=<?=$reserva["id_reserva"] ?>" class="btn btn-danger">Excluir</a></td>
                 </tr>
                 <tr>
                     <td colspan="2" class="p-0 border-0">
                         <div id="detalhes<?= $reserva['id_reserva'] ?>" class="collapse">
                             <div class="p-3 bg-light border-top">
-                                <?= $reserva['telefone'] ?>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <img src="/Imagens/<?= $reserva['imagem'] ?>" class="img-fluid" style="max-height: 300px;">
+                                    </div>
+                                    <div class="col-md-8 d-flex flex-column justify-content-start">
+                                        <?php
+                                        $dataNascimento = new DateTime($reserva['nasc']);
+                                        $hoje = new DateTime();
+
+                                        $idade = $hoje->diff($dataNascimento)->y;
+                                        ?>
+                                        <p><strong>CPF/CNPJ:</strong> <?= formatarCpfCnpj($reserva['cpfcnpj']) ?></p>
+                                        <p><strong>Telefone:</strong> <?= formatarTelefone($reserva['telefone']) ?></p>
+                                        <p><strong>Email:</strong> <?= $reserva['email'] ?></p>
+                                        <p><strong>Nascimento:</strong> <?= date("d/m/Y", strtotime($reserva['nasc'])) ?></p>
+                                        <p><strong>Idade:</strong> <?= $idade ?> Anos</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </td>
