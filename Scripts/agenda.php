@@ -54,6 +54,15 @@
                 case 'agendamento':
                     include("agendamento.php");
                     break;
+                case 'editaragendamento':
+                    include("editaragendamento.php");
+                    break; 
+                case 'excluiragendamento':
+                    include("excluiragendamento.php");
+                    break; 
+                case 'cadastroagendamento':
+                    include("cadastroagendamento.php");
+                    break; 
                 case 'clientes':
                     include("clientes.php");
                     break;
