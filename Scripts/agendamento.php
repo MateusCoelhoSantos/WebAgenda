@@ -122,7 +122,7 @@
                 <tr>
                     <td><?= $reserva['nome'] ?></td>
                     <td><?= $reserva['num_quarto'] .' - '. $reserva['descricao'] ?></td>
-                    <td><?= $reserva['horarioini'] .' - '. $reserva['horariofin'] ?></td>
+                    <td><?= date("d/m/Y H:i", strtotime($reserva['horarioini'])) .' - '. date("d/m/Y H:i", strtotime($reserva['horariofin']))  ?></td>
                     <td>
                         <button class="btn btn-success toggle-collapse" data-bs-toggle="collapse" data-bs-target="#detalhes<?= $reserva['id_reserva'] ?>">
                             Detalhes
