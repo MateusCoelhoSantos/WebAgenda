@@ -22,6 +22,7 @@
             margin-right: 10px;
             width: 250px;
         }
+        
     </style>
 </head>
 <header>
@@ -42,6 +43,17 @@
                         <span class="me-2">até</span>
                         <input class="form-control me-2" type="date" name="datafin" value="<?= $hoje ?>">
                     </div>
+
+                    <!-- <fieldset class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="tipo" name="tipo" value="0" checked>
+                            <label class="form-check-label" for="agenativo">Ativos</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="tipo" name="tipo" value="1">
+                            <label class="form-check-label" for="agenfin">Finalizados</label>
+                        </div>
+                    </fieldset> -->
                 </form>
             </div>
             

@@ -87,7 +87,7 @@
         <tbody class="bg-light">
         <?php
 
-        $quantidade = 20;
+        $quantidade = 10;
 
         $pagina = (isset($_GET['pagina']))?(int)$_GET['pagina']:1;
 
@@ -142,8 +142,9 @@
 </div>
 
 <br>
+<center>
 <?php
-$sqltotal = "SELECT id_pessoa FROM pessoas";
+$sqltotal = "SELECT id_pessoa FROM pessoas where excluido = 0";
 $qrtotal = mysqli_query($conexao,$sqltotal) or die(mysqli_error($conexao));
 $numtotal = mysqli_num_rows($qrtotal);
 $totalpagina = ceil($numtotal/$quantidade); 
@@ -177,5 +178,6 @@ if ($pagina< ($totalpagina-5)) {
 echo "<a href=\"?menuop=clientes&pagina=$totalpagina\">Ultima Pagina</a>";
 
 ?>
+</center>
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>

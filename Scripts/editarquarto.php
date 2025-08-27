@@ -47,7 +47,7 @@ $dados = mysqli_fetch_assoc($rs);
 <body>
 
 <div class="container">
-    <form action="agenda.php?menuop=inserequarto" method="post">
+    <form action="agenda.php?menuop=atualizarquarto" method="post">
         <div>
             <label for="numquarto">ID</label>
             <input type="number"  class="form-control" name="idquarto" value="<?=$dados["id_quarto"]?>" required>

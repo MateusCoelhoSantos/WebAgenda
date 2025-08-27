@@ -31,12 +31,14 @@
         num_quarto,
         descricao,
         status,
-        excluido)
+        excluido,
+        imagem)
         VALUES (
         '{$numquarto}',
         '{$descricao}',
         0,
-        0)";
+        0,
+        '')";
         mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
 
         echo "<center>O Registro Foi Inserido Com Sucesso!</center>";
