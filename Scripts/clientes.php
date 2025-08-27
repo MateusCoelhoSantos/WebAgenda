@@ -54,37 +54,40 @@
 </header>
 <body class="bg-light">
 <div class="container mt-5">
-    <div class="row">
-        <div class="pesquisa">
-            <form class="form" action="agenda.php?menuop=clientes" method="post">
-                <input class="form-control" type="text" name="pesquisa"> 
+    <div class="row align-items-center mb-4">
+        <!-- Campo de pesquisa -->
+        <div class="col-md-9">
+            <form class="d-flex" action="agenda.php?menuop=clientes" method="post">
+                <input class="form-control me-2" type="text" name="pesquisa" placeholder="Pesquisar">
                 <input class="btn btn-success" type="submit" value="Pesquisar">
             </form>
-        </div>  
-        <div class="novocli">
+        </div>
+
+        <!-- Botão novo cliente -->
+        <div class="col-md-3 text-end">
             <a href="agenda.php?menuop=cadastrocliente" class="btn btn-success">Incluir Cliente</a>
         </div>
     </div>
 
-<table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>CPf/CNPJ</th>
-            <th>RG/IE</th>
-            <th>Tipo Pessoa</th>
-            <th>Data de Nascimento</th>
-            <th>E-mail</th>
-            <th>Telefone</th>
-            <th>Sexo</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody class="bg-light">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>CPf/CNPJ</th>
+                <th>RG/IE</th>
+                <th>Tipo Pessoa</th>
+                <th>Data de Nascimento</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Sexo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody class="bg-light">
         <?php
 
-        $quantidade = 20;
+        $quantidade = 10;
 
         $pagina = (isset($_GET['pagina']))?(int)$_GET['pagina']:1;
 
@@ -139,8 +142,9 @@
 </div>
 
 <br>
+<center>
 <?php
-$sqltotal = "SELECT id_pessoa FROM pessoas";
+$sqltotal = "SELECT id_pessoa FROM pessoas where excluido = 0";
 $qrtotal = mysqli_query($conexao,$sqltotal) or die(mysqli_error($conexao));
 $numtotal = mysqli_num_rows($qrtotal);
 $totalpagina = ceil($numtotal/$quantidade); 
@@ -174,5 +178,6 @@ if ($pagina< ($totalpagina-5)) {
 echo "<a href=\"?menuop=clientes&pagina=$totalpagina\">Ultima Pagina</a>";
 
 ?>
+</center>
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>

@@ -32,15 +32,18 @@
 </header>
 <body class="bg-light">
 <div class="container mt-5">
-    <div class="row">
-        <div class="pesquisa">
-            <form class="form" action="agenda.php?menuop=quartos" method="post">
-                <input class="form-control" type="text" name="qrtpesquisa"> 
+    <div class="row align-items-center mb-4">
+        <!-- Campo de pesquisa -->
+        <div class="col-md-9">
+            <form class="d-flex" action="agenda.php?menuop=quartos" method="post">
+                <input class="form-control me-2" type="text" name="qrtpesquisa" placeholder="Pesquisar">
                 <input class="btn btn-success" type="submit" value="Pesquisar">
             </form>
         </div>
-        <div class="novoqrt">
-            <a href="agenda.php?menuop=cadastroquarto"><button type="submit" class="btn btn-success">Incluir Quarto</button></a>
+
+        <!-- Botão de novo quarto -->
+        <div class="col-md-3 text-end">
+            <a href="agenda.php?menuop=cadastroquarto" class="btn btn-success">Incluir Quarto</a>
         </div>
     </div>
 
@@ -57,7 +60,7 @@
         <tbody>
             <?php
 
-            $quantidade = 20;
+            $quantidade = 10;
 
             $pagina = (isset($_GET['pagina']))?(int)$_GET['pagina']:1;
 
@@ -101,6 +104,44 @@
     </table>
 </div>
 
+<br>
+<center>
+<?php
+$sqltotal = "SELECT id_quarto FROM quartos where excluido = 0";
+$qrtotal = mysqli_query($conexao,$sqltotal) or die(mysqli_error($conexao));
+$numtotal = mysqli_num_rows($qrtotal);
+$totalpagina = ceil($numtotal/$quantidade); 
+echo "Total de Registros: $numtotal <br>";
+echo '<a href="?menuop=quartos&pagina=1">Primeira Pagina</a>';
+
+if ($pagina>6) {
+    ?>
+        <a href="?menuop=quartos&pagina=<?php echo $pagina-1?>"> << </a>
+    <?php
+}
+
+for ($i=1; $i <=$totalpagina; $i++) { 
+    
+    if ($i>=($pagina-5) && $i <= ($pagina+5)) {
+        if ($i==$pagina) {
+            echo $i;
+        } else {
+            echo "<a href=\"?menuop=quartos&pagina=$i\">$i</a> ";
+        }
+    }
+}
+
+if ($pagina< ($totalpagina-5)) {
+    ?>
+        <a href="?menuop=quartos&pagina=<?php echo $pagina+1?>"> >> </a>
+    <?php
+}
+
+
+echo "<a href=\"?menuop=quartos&pagina=$totalpagina\">Ultima Pagina</a>";
+
+?>
+</center>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

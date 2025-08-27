@@ -15,7 +15,7 @@
     >
     
     <style>
-        .quadro{
+        /* .quadro{
             background-color: #f8f9fa;
             border-bottom: 1px solid #dee2e6;
             width: 300px;
@@ -25,10 +25,11 @@
             border-right: 1px solid #dee2e6;
             margin-left: 5px;
             float: left;
-        }
+        } */
         header {
             text-align: left;
-            padding:30px;
+            padding:15px;
+            padding-left: 25px;
             background-color: #f8f9fa;
             border-bottom: 1px solid #dee2e6;
         }
@@ -54,12 +55,24 @@
                 case 'agendamento':
                     include("agendamento.php");
                     break;
+                case 'editaragendamento':
+                    include("editaragendamento.php");
+                    break; 
+                case 'excluiragendamento':
+                    include("excluiragendamento.php");
+                    break; 
+                case 'cadastroagendamento':
+                    include("cadastroagendamento.php");
+                    break; 
                 case 'clientes':
                     include("clientes.php");
                     break;
                 case 'quartos':
                     include("quartos.php");
                     break;
+                case 'atualizarquarto':
+                    include("atualizarcliente.php");
+                    break; 
                 case 'cadastrocliente':
                     include("cadastrocliente.php");
                     break;
