@@ -27,17 +27,28 @@
             float: left;
         } */
         header {
-            text-align: left;
+            /* text-align: left;
             padding:15px;
             padding-left: 25px;
             background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6; */
         }
     </style>
 
 </head>
 <body>
+    <?php
+        // Inclui a estrutura do menu lateral oculto
+        require_once('menu_lateral.php'); 
+    ?>
+
     <header>
+        <?php 
+            // Inclui o botão que vai abrir o menu
+            require_once('icone_menu.php'); 
+        ?>
+    </header>
+    <!-- <header>
         <center>
             <h1>WEBAGENDA</h1>
             <nav>
@@ -47,10 +58,14 @@
                 <a href="index.php"><button type="submit" class="btn btn-primary">sair</button></a>
             </nav>
         </center>
-    </header>
-    <main>  
+    </header> -->
+    <!-- <main>  
+        
+    </main> -->
+    <main class="container">
         <?php
-            $menuop = (isset($_GET["menuop"]))?$_GET["menuop"]:"agendamento";
+            // O seu sistema de rotas PHP para incluir as páginas pode continuar aqui
+            $menuop = (isset($_GET['menuop'])) ? $_GET['menuop'] : 'agendamento';
             switch ($menuop) {
                 case 'agendamento':
                     include("agendamento.php");
@@ -105,6 +120,9 @@
                     break;
             }
         ?>
+        
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
