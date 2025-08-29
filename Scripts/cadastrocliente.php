@@ -37,6 +37,8 @@
 <Header>
     <center><h3>Cadastro de Clientes</h3></center>
 </Header>
+<body>
+    
 <div class="container mt-3">
     <form action="agenda.php?menuop=inserecliente" method="post">
         <div>
@@ -101,4 +103,7 @@
         </div>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

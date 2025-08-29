@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inserindo cliente</title>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         .container{
             display: flex;
@@ -22,6 +24,7 @@
     <center><h3>Cliente Inserido</h3></center>
 </header>
 <body>
+
 
 <?php
 
@@ -69,6 +72,8 @@
         <center><a href="agenda.php?menuop=clientes"><button type="submit" class="btn btn-success">Listagem</button></a></center>   
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
