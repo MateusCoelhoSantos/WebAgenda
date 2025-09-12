@@ -1,5 +1,5 @@
 <?php
-    include("conexao.php")
+    include("conexao.php");
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -8,32 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebAgenda - Agenda</title>
 
-    <link rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous"
-    >
-    
-    <style>
-        /* .quadro{
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            width: 300px;
-            border-top: 1px solid #dee2e6;
-            border-width: 1px solid #dee2e6;
-            border-left: 1px solid #dee2e6;
-            border-right: 1px solid #dee2e6;
-            margin-left: 5px;
-            float: left;
-        } */
-        header {
-            /* text-align: left;
-            padding:15px;
-            padding-left: 25px;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6; */
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 
 </head>
 <body>
@@ -48,20 +24,7 @@
             require_once('icone_menu.php'); 
         ?>
     </header>
-    <!-- <header>
-        <center>
-            <h1>WEBAGENDA</h1>
-            <nav>
-                <a href="agenda.php?menuop=agendamento"><button type="submit" class="btn btn-primary">Agendamento</button></a>
-                <a href="agenda.php?menuop=clientes"><button type="submit" class="btn btn-primary">Clientes</button></a>
-                <a href="agenda.php?menuop=quartos"><button type="submit" class="btn btn-primary">Quartos</button></a>
-                <a href="index.php"><button type="submit" class="btn btn-primary">sair</button></a>
-            </nav>
-        </center>
-    </header> -->
-    <!-- <main>  
-        
-    </main> -->
+
     <main class="container">
         <?php
             // O seu sistema de rotas PHP para incluir as páginas pode continuar aqui
@@ -86,7 +49,7 @@
                     include("quartos.php");
                     break;
                 case 'atualizarquarto':
-                    include("atualizarcliente.php");
+                    include("atualizarquarto.php");
                     break; 
                 case 'cadastrocliente':
                     include("cadastrocliente.php");

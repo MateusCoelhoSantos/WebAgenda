@@ -3,11 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clientes</title>
 
-    <!-- <link rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous"
-    > -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -128,7 +124,7 @@
             <td><?=$dados["telefone"] ?></td>
             <td><?=$dados["orientacao"] ?></td>
             <td><a href="agenda.php?menuop=editarcliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-primary">Alterar</a>
-                <a href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-danger">Excluir</a></td>
+                <a onclick="" href="agenda.php?menuop=excluircliente&idcli=<?=$dados["id_pessoa"] ?>" class="btn btn-danger">Excluir</a></td>
         </tr>
     <?php
         }
@@ -179,5 +175,5 @@ echo "<a href=\"?menuop=clientes&pagina=$totalpagina\">Ultima Pagina</a>";
 
 ?>
 </center>
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>

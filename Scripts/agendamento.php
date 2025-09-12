@@ -149,7 +149,7 @@
                             <div class="p-3 bg-light border-top">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <img src="/Imagens/<?= $reserva['imagem'] ?>" class="img-fluid" style="max-height: 300px;">
+                                        <img src="../Imagens/<?= $reserva['imagem'] ?>" class="img-fluid" style="max-height: 300px;">
                                     </div>
                                     <div class="col-md-8 d-flex flex-column justify-content-start">
                                         <?php
@@ -173,6 +173,6 @@
     </table>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>
 </html>

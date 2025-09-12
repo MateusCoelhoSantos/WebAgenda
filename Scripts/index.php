@@ -7,11 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="estilo-padrao.css">
     <title>WebAgenda - Centro</title>
 
@@ -39,7 +36,7 @@
 </head>
 <body>
     <header>
-        <img src="\Imagens\LogoWebAgenda.png" width="120" height="120"> 
+        <img src="../Imagens/LogoWebAgenda.png" width="120" height="120">
         <br>
         <b><h1>WebAgenda</h1></b>
         <nav>
