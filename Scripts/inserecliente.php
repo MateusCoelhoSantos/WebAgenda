@@ -1,79 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inserindo cliente</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        .container{
-            display: flex;
-            width: 100vw;
-            height: 100px;
-            justify-content: center;
-            align-items: center;
-        }
-        .voltar{
-            margin-right: 50px;
-        }
-    </style>
-</head>
-<header>
-    <center><h3>Cliente Inserido</h3></center>
-</header>
-<body>
-
-
 <?php
+// 1. Inicia a sessão para usar as mensagens de feedback
+session_start();
+include("conexao.php"); // Inclui seu arquivo de conexão
 
-    $clinome = mysqli_real_escape_string($conexao,$_POST["clinome"]);
-    $clicpfcnpj = mysqli_real_escape_string($conexao,$_POST["clicpfcnpj"]);
-    $clirgie = mysqli_real_escape_string($conexao,$_POST["clirgie"]);
-    $clinasc = mysqli_real_escape_string($conexao,$_POST["clinasc"]);
-    $cliemail = mysqli_real_escape_string($conexao,$_POST["cliemail"]);
-    $clitel = mysqli_real_escape_string($conexao,$_POST["clitel"]);
-    $clitipo = mysqli_real_escape_string($conexao,$_POST["clitipo"]);
-    $cliorientacao = mysqli_real_escape_string($conexao,$_POST["cliorientacao"]);
+// 2. Bloco try-catch para um tratamento de erros mais robusto
+try {
+    // 3. Validação dos dados essenciais
+    if (empty($_POST["clinome"]) || empty($_POST["clicpfcnpj"])) {
+        throw new Exception("Nome e CPF/CNPJ são obrigatórios.");
+    }
 
+    // Captura os dados do POST
+    $clinome    = $_POST["clinome"];
+    $clicpfcnpj = $_POST["clicpfcnpj"];
+    $clirgie    = $_POST["clirgie"];
+    $clinasc    = $_POST["clinasc"];
+    $cliemail   = $_POST["cliemail"];
+    $clitel     = $_POST["clitel"];
+    $clitipo    = $_POST["clitipo"];
+    $cligenero  = $_POST["cligenero"]; // Correção do nome do campo
+
+    // 4. Prepara a consulta SQL com placeholders (?) para máxima segurança
     $sql = "INSERT INTO pessoas (
-            nome,
-            cpfcnpj,
-            rgie,
-            nasc,
-            email,
-            telefone,
-            f_j,
-            orientacaosex,
-            tipopessoa,
-            excluido) 
-            VALUES (
-            '{$clinome}',
-            '{$clicpfcnpj}',
-            '{$clirgie}',
-            '{$clinasc}',
-            '{$cliemail}',
-            '{$clitel}',
-            '{$clitipo}',
-            '{$cliorientacao}',
-            1,
-            0)";
-            mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
+                nome, cpfcnpj, rgie, nasc, email, telefone,
+                f_j, genero, tipopessoa, excluido
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0)";
+    
+    $stmt = mysqli_prepare($conexao, $sql);
 
-            echo " <center> O Registro Foi Inserido Com Sucesso! </center>";
+    if ($stmt === false) {
+        throw new Exception("Erro ao preparar a consulta: " . mysqli_error($conexao));
+    }
 
+    // 5. Associa os parâmetros (bind) com os tipos corretos
+    // s = string, i = integer
+    mysqli_stmt_bind_param($stmt, 'ssssssis',
+        $clinome,
+        $clicpfcnpj,
+        $clirgie,
+        $clinasc,
+        $cliemail,
+        $clitel,
+        $clitipo,
+        $cligenero
+    );
+    
+    // 6. Executa a consulta
+    if (mysqli_stmt_execute($stmt)) {
+        // Se deu certo, cria a mensagem de sucesso
+        $_SESSION['message'] = [
+            'type' => 'success',
+            'text' => 'Cliente cadastrado com sucesso!'
+        ];
+    } else {
+        throw new Exception("Não foi possível executar o cadastro.");
+    }
+
+} catch (Exception $e) {
+    // Se deu qualquer erro, cria a mensagem de erro
+    $_SESSION['message'] = [
+        'type' => 'error',
+        'text' => 'Erro ao cadastrar o cliente: ' . $e->getMessage()
+    ];
+}
+
+// 7. Redireciona o usuário de volta para a lista de clientes
+header('Location: agenda.php?menuop=clientes');
+exit(); // Garante que o script pare após o redirecionamento
 ?>
-<div class="container">
-    <div class="voltar">
-        <center><a href="agenda.php?menuop=cadastrocliente"><button type="submit" class="btn btn-success">Voltar</button></a></center>
-    </div>
-    <div class="listagem">
-        <center><a href="agenda.php?menuop=clientes"><button type="submit" class="btn btn-success">Listagem</button></a></center>   
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>

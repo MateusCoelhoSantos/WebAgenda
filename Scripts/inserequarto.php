@@ -1,60 +1,51 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inserindo Quarto</title>
+<?php
+// 1. Inicia a sessão para usar as mensagens de feedback
+session_start();
+include("conexao.php"); // Inclui seu arquivo de conexão
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+// 2. Bloco try-catch para um tratamento de erros mais robusto
+try {
+    // 3. Validação dos dados essenciais
+    if (empty($_POST["numquarto"]) || empty($_POST["descricao"])) {
+        throw new Exception("Número do quarto e descrição são obrigatórios.");
+    }
 
-    <style>
-        .container{
-            display: flex;
-            width: 100vw;
-            height: 100px;
-            justify-content: center;
-            align-items: center;
-        }
-        .voltar{
-            margin-right: 50px;
-        }
-    </style>
-</head>
-<header>
-    <center><h3>Quarto Inserido</h3></center>
-</header>
-<body>
-    <?php
+    // Captura os dados do POST
+    $numquarto = $_POST["numquarto"];
+    $descricao = $_POST["descricao"];
 
-        $numquarto = mysqli_real_escape_string($conexao,$_POST["numquarto"]);;
-        $descricao = mysqli_real_escape_string($conexao,$_POST["descricao"]);;
+    // 4. Prepara a consulta SQL com placeholders (?) para máxima segurança
+    $sql = "INSERT INTO quartos (num_quarto, descricao, status, excluido) VALUES (?, ?, 0, 0)";
+    
+    $stmt = mysqli_prepare($conexao, $sql);
 
-        $sql = "INSERT INTO  quartos (
-        num_quarto,
-        descricao,
-        status,
-        excluido,
-        imagem)
-        VALUES (
-        '{$numquarto}',
-        '{$descricao}',
-        0,
-        0,
-        '')";
-        mysqli_query($conexao,$sql) or die("Erro ao Executar a Consulta!" . mysqli_error($conexao));
+    if ($stmt === false) {
+        throw new Exception("Erro ao preparar a consulta: " . mysqli_error($conexao));
+    }
 
-        echo "<center>O Registro Foi Inserido Com Sucesso!</center>";
-    ?>
-<div class="container">
-    <div class="voltar">
-        <center><a href="agenda.php?menuop=cadastroquarto"><button type="submit" class="btn btn-success">Voltar</button></a></center>
-    </div>
-    <div class="listagem">
-        <center><a href="agenda.php?menuop=quartos"><button type="submit" class="btn btn-success">Listagem</button></a></center>   
-    </div>
-</div>
+    // 5. Associa os parâmetros (bind) com os tipos corretos (s = string)
+    mysqli_stmt_bind_param($stmt, 'ss', $numquarto, $descricao);
+    
+    // 6. Executa a consulta
+    if (mysqli_stmt_execute($stmt)) {
+        // Se deu certo, cria a mensagem de sucesso
+        $_SESSION['message'] = [
+            'type' => 'success',
+            'text' => 'Quarto cadastrado com sucesso!'
+        ];
+    } else {
+        throw new Exception("Não foi possível executar o cadastro.");
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+} catch (Exception $e) {
+    // Se deu qualquer erro, cria a mensagem de erro
+    $_SESSION['message'] = [
+        'type' => 'error',
+        'text' => 'Erro ao cadastrar o quarto: ' . $e->getMessage()
+    ];
+}
 
-</body>
-</html>
+// 7. Redireciona o usuário de volta para a lista de quartos
+header('Location: agenda.php?menuop=quartos');
+exit(); // Garante que o script pare após o redirecionamento
+?>

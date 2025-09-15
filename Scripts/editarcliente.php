@@ -1,116 +1,125 @@
 <?php
-$idcli = isset($_GET["idcli"]) ? $_GET["idcli"] : null;
-if ($idcli === null) {
-    die("ID do cliente não foi fornecido.");
-}
-$sql = "SELECT * FROM pessoas WHERE id_pessoa = {$idcli}";
-$rs = mysqli_query($conexao,$sql) or die("Erro ao Recuperar os Dados do Registro! " . mysqli_error($conexao));
-$dados = mysqli_fetch_assoc($rs);
-?>
+session_start();
+include_once("conexao.php");
 
+// --- SEGURANÇA: Buscando dados com Prepared Statement ---
+$dados = null;
+try {
+    $idcli = $_GET["idcli"] ?? null;
+    if ($idcli === null || !is_numeric($idcli)) {
+        throw new Exception("ID do cliente não foi fornecido ou é inválido.");
+    }
+
+    $sql = "SELECT * FROM pessoas WHERE id_pessoa = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idcli);
+    mysqli_stmt_execute($stmt);
+    $rs = mysqli_stmt_get_result($stmt);
+    $dados = mysqli_fetch_assoc($rs);
+
+    if (!$dados) {
+        throw new Exception("Cliente com o ID {$idcli} não encontrado.");
+    }
+} catch (Exception $e) {
+    die("Erro: " . $e->getMessage());
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Cliente</title>
-
-    <link rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous"
-    >
-    <style>
-        .container{
-            margin-top: 15px;
-            margin-bottom: 100px;
-        }
-        .form-group{
-            float: left;
-            margin-top: 25px;
-        }
-        .form-group2{
-            float: left;
-            margin-top: 25px;
-            margin-left: 25px;
-        }
-        .botao{
-            margin-top: 25px;
-            margin-left: 1025px;  
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
+<body style="background-color: #f0f2f5;">
 
-<Header>
-    <center><h3>Editar Cliente</h3></center>
-</Header>
-<div class="container">
-    <form action="agenda.php?menuop=atualizarcliente" method="post">
-        <div>
-            <label for="cliid">ID</label>
-            <input type="text"  class="form-control" name="cliid" value="<?=$dados["id_pessoa"]?>" required>
-        </div>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h3 class="text-center mb-0">Editar Cliente</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form action="agenda.php?menuop=atualizarcliente" method="post">
+                        
+                        <input type="hidden" name="cliid" value="<?= htmlspecialchars($dados["id_pessoa"]) ?>">
 
-        <div>
-            <label for="clinome">Nome</label>
-            <input type="text"  class="form-control" name="clinome" value="<?=$dados["nome"]?>" required>
-        </div>
-        
-        <div>
-            <label for="clicpfcnpj">CPF/CNPJ</label>
-            <input type="text" class="form-control" name="clicpfcnpj" value="<?=$dados["cpfcnpj"]?>" required>
-        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="clinome" class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="clinome" name="clinome" value="<?= htmlspecialchars($dados["nome"]) ?>" required>
+                            </div>
 
-        <div>
-            <label for="clirgie">RG/IE</label>
-            <input type="text" class="form-control" name="clirgie" value="<?=$dados["rgie"]?>">
-        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="clicpfcnpj" class="form-label">CPF/CNPJ</label>
+                                <input type="text" class="form-control" id="clicpfcnpj" name="clicpfcnpj" value="<?= htmlspecialchars($dados["cpfcnpj"]) ?>" required>
+                            </div>
 
-        <div>
-            <label for="clinasc">Data de Nascimento</label>
-            <input type="date" class="form-control" name="clinasc" value="<?=$dados["nasc"]?>">
-        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="clirgie" class="form-label">RG/IE</label>
+                                <input type="text" class="form-control" id="clirgie" name="clirgie" value="<?= htmlspecialchars($dados["rgie"]) ?>">
+                            </div>
 
-        <div>
-            <label for="cliemail">E-mail</label>
-            <input type="text" class="form-control" name="cliemail" value="<?=$dados["email"]?>">
-        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cliemail" class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="cliemail" name="cliemail" value="<?= htmlspecialchars($dados["email"]) ?>">
+                            </div>
 
-        <div>
-            <label for="clitel">Telefone</label>
-            <input type="text" class="form-control" name="clitel" value="<?=$dados["telefone"]?>">
-        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="clitel" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="clitel" name="clitel" value="<?= htmlspecialchars($dados["telefone"]) ?>">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="clinasc" class="form-label">Data de Nascimento</label>
+                                <input type="date" class="form-control" id="clinasc" name="clinasc" value="<?= htmlspecialchars($dados["nasc"]) ?>">
+                            </div>
 
-        <fieldset class="form-group">
-            <legend class="col-form-label pt-0">Tipo Pessoa:</legend>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" id="pessoafisica" name="clitipo" value="0" <?php if ($dados["f_j"] == 0) echo 'checked'; ?> required>
-                <label class="form-check-label" for="pessoafisica">Pessoa Fisica</label>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label d-block">Tipo Pessoa</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="pessoafisica" name="clitipo" value="0" <?php if ($dados["f_j"] == 0) echo 'checked'; ?> required>
+                                    <label class="form-check-label" for="pessoafisica">Física</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="pessoajuridica" name="clitipo" value="1" <?php if ($dados["f_j"] == 1) echo 'checked'; ?> required>
+                                    <label class="form-check-label" for="pessoajuridica">Jurídica</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label d-block">Gênero</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="masculino" name="cligenero" value="M" <?php if ($dados["genero"] == "M") echo 'checked'; ?> required>
+                                    <label class="form-check-label" for="masculino">Masculino</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="feminino" name="cligenero" value="F" <?php if ($dados["genero"] == "F") echo 'checked'; ?> required>
+                                    <label class="form-check-label" for="feminino">Feminino</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="naoidentificado" name="cligenero" value="N" <?php if ($dados["genero"] == "N") echo 'checked'; ?> required>
+                                    <label class="form-check-label" for="naoidentificado">Não Informado</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer text-end bg-white px-0 pt-3">
+                            <a href="agenda.php?menuop=clientes" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success" name="atualizar">
+                                <i class="bi bi-check-circle"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" id="pessoajuridica" name="clitipo" value="1" <?php if ($dados["f_j"] == 1) echo 'checked'; ?> required>
-                <label class="form-check-label" for="pessoajuridica">Pessoa Juridica</label>
-            </div>
-        </fieldset>
-
-        <fieldset class="form-group2">
-            <legend class="col-form-label pt-0">Sexo:</legend>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" id="masculino" name="cliorientacao" value="M" <?php if ($dados["orientacaosex"] == "M") echo 'checked'; ?> required>
-                <label class="form-check-label" for="masculino">Masculino</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" id="feninino" name="cliorientacao" value="F" <?php if ($dados["orientacaosex"] == "F") echo 'checked'; ?> required>
-                <label class="form-check-label" for="feninino">Feminino</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" id="naoidentificado" name="cliorientacao" value="N" <?php if ($dados["orientacaosex"] == "N") echo 'checked'; ?> required>
-                <label class="form-check-label" for="naoidentificado">Não Identificado</label>
-            </div>
-        </fieldset>
-        <div class ="botao">
-            <input type="submit" class="btn btn-success" value="atualizar" nome="atualizar">
         </div>
-    </form>
+    </div>
 </div>
+
+</body>
 </html>

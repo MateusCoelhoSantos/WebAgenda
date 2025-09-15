@@ -1,49 +1,42 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atualizando Quarto</title>
-
-    <style>
-        .container{
-            display: flex;
-            width: 100vw;
-            height: 100px;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
-</head>
-<header>
-    <center><h3>Quarto Atualizado</h3></center>
-</header>
-<body>
-
 <?php
+session_start();
+include("conexao.php");
 
-    $id_quarto = mysqli_real_escape_string($conexao,$_POST["idquarto"]);
-    $num_quarto = mysqli_real_escape_string($conexao,$_POST["numquarto"]);
-    $descricao = mysqli_real_escape_string($conexao,$_POST["descricao"]);
-    // $status = mysqli_real_escape_string($conexao,$_POST[""]);
-    // $excluido = mysqli_real_escape_string($conexao,$_POST[""]);
-    // $imagem = mysqli_real_escape_string($conexao,$_POST["img"]);
+try {
+    if (empty($_POST["idquarto"]) || empty($_POST["numquarto"])) {
+        throw new Exception("Dados essenciais não fornecidos.");
+    }
 
-    $sql = "UPDATE quartos SET
-            num_quarto = '{$num_quarto}',
-            descricao = '{$descricao}'
-            WHERE id_quarto = {$id_quarto}
-            ";
-            mysqli_query($conexao,$sql) or die("Erro ao Executar a Atualização! " . mysqli_error($conexao));
+    $idquarto   = $_POST["idquarto"];
+    $numquarto  = $_POST["numquarto"];
+    $descricao  = $_POST["descricao"];
 
-            echo "<center>O Registro Foi Atualizado Com Sucesso!</center>";
+    $sql = "UPDATE quartos SET num_quarto = ?, descricao = ? WHERE id_quarto = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
 
+    if ($stmt === false) {
+        throw new Exception("Erro ao preparar a consulta.");
+    }
+    
+    mysqli_stmt_bind_param($stmt, 'ssi', $numquarto, $descricao, $idquarto);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        $_SESSION['message'] = [
+            'type' => 'success',
+            'text' => 'Quarto atualizado com sucesso!'
+        ];
+    } else {
+        throw new Exception("Não foi possível executar a atualização.");
+    }
+
+} catch (Exception $e) {
+    $_SESSION['message'] = [
+        'type' => 'error',
+        'text' => 'Erro: ' . $e->getMessage()
+    ];
+}
+
+// Redireciona de volta para a lista
+header('Location: agenda.php?menuop=quartos');
+exit();
 ?>
-<div class="container">
-    <div class="listagem">
-        <center><a href="agenda.php?menuop=quartos"><button type="submit" class="btn btn-success">Voltar</button></a></center>   
-    </div>
-</div>
-
-</body>
-</html>

@@ -1,54 +1,48 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incluir Quarto</title>
-
+    <title>Cadastro de Quarto</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-
-    <style>
-        .container{
-            margin-top: 15px;
-            margin-bottom: 100px;
-        }
-        .botao{
-            margin-top: 25px;
-            margin-left: 94%; 
-            margin-bottom: 50px;  
-        }
-        /* .container{
-            display: flex;
-            width: 100vw;
-            height: 100px;
-            justify-content: center;
-            align-items: center;
-        } */
-    </style>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<header>
-    <center><h3>Cadastro de Quarto</h3></center>
-</header>
-<body>
+<body style="background-color: #f0f2f5;">
 
-<div class="container">
-    <form action="agenda.php?menuop=inserequarto" method="post">
-        <div>
-            <label for="numquarto">Número do Quarto</label>
-            <input type="number"  class="form-control" name="numquarto" required>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h3 class="text-center mb-0">Cadastrar Novo Quarto</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form action="agenda.php?menuop=inserequarto" method="post">
+                        
+                        <div class="mb-3">
+                            <label for="numquarto" class="form-label">Número do Quarto</label>
+                            <input type="number" class="form-control" id="numquarto" name="numquarto" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição (Ex: Suíte Master, Quarto Simples)</label>
+                            <input type="text" class="form-control" id="descricao" name="descricao" required>
+                        </div>
+                        
+                        <div class="card-footer text-end bg-white px-0 pt-3">
+                            <a href="agenda.php?menuop=quartos" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success" name="incluir">
+                                <i class="bi bi-check-circle"></i> Cadastrar Quarto
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <div>
-            <label for="descricao">Descrição</label>
-            <input type="text" class="form-control" name="descricao" required>
-        </div>
-        <div class ="botao">
-            <input class="btn btn-success" type="submit" value="incluir" nome="incluir">
-        </div>
-    </form>
+    </div>
 </div>
-    
+
 </body>
 </html>

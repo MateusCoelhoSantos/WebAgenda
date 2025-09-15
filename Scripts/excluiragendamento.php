@@ -1,11 +1,37 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+<?php
+// É OBRIGATÓRIO ter session_start() no topo para que as mensagens funcionem.
+session_start();
+include("conexao.php");
+
+try {
+    $idreserva = $_GET['idreserva'] ?? null;
+    if ($idreserva === null || !is_numeric($idreserva)) {
+        throw new Exception("ID do agendamento é inválido.");
+    }
+
+    $sql = "UPDATE reservas SET excluido = 1 WHERE id_reserva = ?";
+    $stmt = $conexao->prepare($sql);
+    $stmt->bind_param("i", $idreserva);
     
-</body>
-</html>
+    if ($stmt->execute()) {
+        // MENSAGEM DE SUCESSO
+        $_SESSION['message'] = [
+            'type' => 'success',
+            'text' => 'Agendamento excluído com sucesso!'
+        ];
+    } else {
+        throw new Exception("Não foi possível excluir o agendamento.");
+    }
+
+} catch (Exception $e) {
+    // MENSAGEM DE ERRO
+    $_SESSION['message'] = [
+        'type' => 'error',
+        'text' => 'Erro: ' . $e->getMessage()
+    ];
+}
+
+// Redireciona de volta para a lista
+header('Location: agenda.php?menuop=agendamento');
+exit();
+?>

@@ -1,71 +1,72 @@
 <?php
-$idquarto = isset($_GET["idquarto"]) ? $_GET["idquarto"] : null;
-if ($idquarto === null) {
-    die("ID do Quarto não foi fornecido.");
-}
-$sql = "SELECT * FROM quartos WHERE id_quarto = {$idquarto}";
-$rs = mysqli_query($conexao,$sql) or die("Erro ao Recuperar os Dados do Registro! " . mysqli_error($conexao));
-$dados = mysqli_fetch_assoc($rs);
-?>
+include_once("conexao.php");
 
+$dados = null;
+try {
+    $idquarto = $_GET["idquarto"] ?? null;
+    if ($idquarto === null || !is_numeric($idquarto)) {
+        throw new Exception("ID do Quarto inválido ou não fornecido.");
+    }
+
+    $sql = "SELECT * FROM quartos WHERE id_quarto = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idquarto);
+    mysqli_stmt_execute($stmt);
+    $rs = mysqli_stmt_get_result($stmt);
+    $dados = mysqli_fetch_assoc($rs);
+
+    if (!$dados) {
+        throw new Exception("Nenhum quarto encontrado com o ID fornecido.");
+    }
+} catch (Exception $e) {
+    die("Erro: " . $e->getMessage());
+}
+?>
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editando Quarto</title>
-
-    <link rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous"
-    >
-
-    <style>
-        .container{
-            margin-top: 15px;
-            margin-bottom: 100px;
-        }
-        .botao{
-            margin-top: 25px;
-            margin-left: 1025px; 
-            margin-bottom: 50px;  
-        }
-        /* .container{
-            display: flex;
-            width: 100vw;
-            height: 100px;
-            justify-content: center;
-            align-items: center;
-        } */
-    </style>
-
+    <title>Editar Quarto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<header>
-    <center><h3>Editar Quarto</h3></center>
-</header>
-<body>
+<body style="background-color: #f0f2f5;">
 
-<div class="container">
-    <form action="agenda.php?menuop=atualizarquarto" method="post">
-        <div>
-            <label for="numquarto">ID</label>
-            <input type="number"  class="form-control" name="idquarto" value="<?=$dados["id_quarto"]?>" required>
-        </div>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h3 class="text-center mb-0">Editar Quarto</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form action="agenda.php?menuop=atualizarquarto" method="post">
+                        
+                        <input type="hidden" name="idquarto" value="<?= htmlspecialchars($dados["id_quarto"]) ?>">
 
-        <div>
-            <label for="numquarto">Número do Quarto</label>
-            <input type="number"  class="form-control" name="numquarto" value="<?=$dados["num_quarto"]?>" required>
+                        <div class="mb-3">
+                            <label for="numquarto" class="form-label">Número do Quarto</label>
+                            <input type="text" class="form-control" id="numquarto" name="numquarto" value="<?= htmlspecialchars($dados["num_quarto"]) ?>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição (Tipo do Quarto)</label>
+                            <input type="text" class="form-control" id="descricao" name="descricao" value="<?= htmlspecialchars($dados["descricao"]) ?>" required>
+                        </div>
+
+                        <div class="card-footer text-end bg-white px-0 pt-3">
+                            <a href="agenda.php?menuop=quartos" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success" name="atualizar">
+                                <i class="bi bi-check-circle"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <div>
-            <label for="descricao">Descrição</label>
-            <input type="text" class="form-control" name="descricao"  value="<?=$dados["descricao"]?>" required>
-        </div>
-        <div class ="botao">
-            <input type="submit" class="btn btn-success" value="atualizar" nome="atualizar">
-        </div>
-    </form>
+    </div>
 </div>
     
 </body>
