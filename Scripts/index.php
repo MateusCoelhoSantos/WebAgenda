@@ -1,5 +1,8 @@
 <?php
-session_start();
+// A forma correta e segura de garantir que a sessão está ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 include("conexao.php");
 ?>
