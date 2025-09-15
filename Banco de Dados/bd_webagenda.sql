@@ -20,6 +20,7 @@ CREATE DATABASE IF NOT EXISTS `webagenda` /*!40100 DEFAULT CHARACTER SET utf8mb4
 USE `webagenda`;
 
 -- Copiando estrutura para tabela webagenda.contato
+DROP TABLE IF EXISTS `contato`;
 CREATE TABLE IF NOT EXISTS `contato` (
   `id_contato` int NOT NULL AUTO_INCREMENT,
   `id_pessoa` int DEFAULT NULL,
@@ -34,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `contato` (
 -- Copiando dados para a tabela webagenda.contato: ~0 rows (aproximadamente)
 
 -- Copiando estrutura para tabela webagenda.endereco
+DROP TABLE IF EXISTS `endereco`;
 CREATE TABLE IF NOT EXISTS `endereco` (
   `id_endereco` int unsigned NOT NULL AUTO_INCREMENT,
   `id_pessoa` int DEFAULT NULL,
@@ -51,6 +53,7 @@ CREATE TABLE IF NOT EXISTS `endereco` (
 -- Copiando dados para a tabela webagenda.endereco: ~0 rows (aproximadamente)
 
 -- Copiando estrutura para tabela webagenda.estoque
+DROP TABLE IF EXISTS `estoque`;
 CREATE TABLE IF NOT EXISTS `estoque` (
   `id_produto` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) DEFAULT NULL,
@@ -70,6 +73,7 @@ CREATE TABLE IF NOT EXISTS `estoque` (
 -- Copiando dados para a tabela webagenda.estoque: ~0 rows (aproximadamente)
 
 -- Copiando estrutura para tabela webagenda.grupo
+DROP TABLE IF EXISTS `grupo`;
 CREATE TABLE IF NOT EXISTS `grupo` (
   `id_grupo` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) DEFAULT NULL,
@@ -79,6 +83,7 @@ CREATE TABLE IF NOT EXISTS `grupo` (
 -- Copiando dados para a tabela webagenda.grupo: ~0 rows (aproximadamente)
 
 -- Copiando estrutura para tabela webagenda.itensvenda
+DROP TABLE IF EXISTS `itensvenda`;
 CREATE TABLE IF NOT EXISTS `itensvenda` (
   `id_item` int NOT NULL AUTO_INCREMENT,
   `id_venda` int DEFAULT NULL,
@@ -94,6 +99,7 @@ CREATE TABLE IF NOT EXISTS `itensvenda` (
 -- Copiando dados para a tabela webagenda.itensvenda: ~0 rows (aproximadamente)
 
 -- Copiando estrutura para tabela webagenda.marca
+DROP TABLE IF EXISTS `marca`;
 CREATE TABLE IF NOT EXISTS `marca` (
   `id_marca` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) DEFAULT NULL,
@@ -103,6 +109,7 @@ CREATE TABLE IF NOT EXISTS `marca` (
 -- Copiando dados para a tabela webagenda.marca: ~0 rows (aproximadamente)
 
 -- Copiando estrutura para tabela webagenda.pessoas
+DROP TABLE IF EXISTS `pessoas`;
 CREATE TABLE IF NOT EXISTS `pessoas` (
   `id_pessoa` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -113,68 +120,158 @@ CREATE TABLE IF NOT EXISTS `pessoas` (
   `tipopessoa` smallint DEFAULT NULL COMMENT '0-Usuario, 1-Cliente, 2-Medico',
   `email` varchar(50) DEFAULT NULL,
   `telefone` varchar(50) DEFAULT NULL,
-  `orientacaosex` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'M-Masculino, F-Feminino, N-Não Identificado',
+  `genero` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'M-Masculino, F-Feminino, N-Não Identificado',
+  `excluido` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id_pessoa`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.pessoas: ~6 rows (aproximadamente)
-INSERT IGNORE INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `orientacaosex`) VALUES
-	(1, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'M'),
-	(2, 'Mateus Santos', '02878024265', '0001', '2007-09-13', 0, 1, 'Mateus@gmail.com', '69992235346', 'M'),
-	(3, 'teste', '123', '123', '2004-05-07', 0, 1, 'teste@gmail.com', '123', 'M'),
-	(4, 'Atualização', 'atual', 'atualizado', '2024-06-18', 0, 1, 'atualizado@atual.com', '1231231213', 'M'),
-	(5, 'teste2', '123321', '321123', '2024-06-18', 0, 1, 'teste2@gmail.com', '123321', 'N'),
-	(7, 'amanda amorim', '1234', '1234', '2024-05-31', 0, 1, 'teste', '123321', 'F'),
-	(8, 'roberto renato', '123', '123', '2024-05-26', 0, 1, 'robren@hotmail.com', '431123', 'N'),
-	(9, 'jose olivas', '567765', '43232', '2024-03-05', 0, 1, 'teste', 'teste', 'N'),
-	(10, 'paulinho pereira', '1233254', '123657', '2023-09-06', 0, 1, 'pereira@paulinho.com', 'treqwe', 'M'),
-	(11, 'atestado', 'amianto', 'eutanasia', '2024-02-16', 1, 1, 'jovem', 'magaiver', 'N'),
-	(12, 'abraco', '099876543123', '123345', '2024-01-24', 1, 1, 'jovem', '123321', 'F'),
-	(13, 'amanda amorim', '1234', '1234', '2004-02-13', 1, 1, 'atualizado@atual.com', '431123', 'F'),
-	(14, 'jose olivas', '567765', '123657', '2024-05-26', 1, 1, 'jovem', '431123', 'M'),
-	(15, 'amanda amorim', '1234', '43232', '2024-04-03', 1, 1, 'atualizado@atual.com', '1231231213', 'N');
+-- Copiando dados para a tabela webagenda.pessoas: ~63 rows (aproximadamente)
+INSERT IGNORE INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `genero`, `excluido`) VALUES
+	(1, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'F', 0),
+	(2, 'Mateus Santos', '02878024265', '0001', '2007-09-13', 0, 1, 'Mateus@gmail.com', '69992235346', 'M', 1),
+	(4, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'M', 0),
+	(5, 'teste2', '123321', '321123', '2024-06-18', 0, 1, 'teste2@gmail.com', '123321', 'N', 1),
+	(7, 'amanda amorim', '1234', '1234', '2024-05-31', 1, 1, 'teste', '123321', 'M', 1),
+	(8, 'roberto renato', '123', '123', '2024-05-26', 0, 1, 'robren@hotmail.com', '431123', 'F', 1),
+	(9, 'jose olivas', '567765', '43232', '2024-03-05', 0, 1, 'teste', 'teste', 'N', 1),
+	(10, 'paulinho pereira', '1233254', '123657', '2023-09-06', 0, 1, 'pereira@paulinho.com', 'treqwe', 'M', 0),
+	(11, 'atestado', 'amianto', 'eutanasia', '2024-02-16', 1, 1, 'jovem', 'magaiver', 'N', 0),
+	(12, 'abraco', '099876543123', '123345', '2024-01-24', 1, 1, 'jovem@gmail.com', '123321', 'F', 0),
+	(13, 'amanda amorim', '1234', '1234', '2004-02-13', 1, 1, 'atualizado@atual.com', '431123', 'F', 1),
+	(14, 'jose olivas', '567765', '123657', '2024-05-26', 1, 1, 'jovem', '431123', 'M', 0),
+	(15, 'amanda amorim', '1234', '43232', '2024-04-03', 1, 1, 'atualizado@atual.com', '1231231213', 'F', 0),
+	(16, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 1),
+	(17, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 1),
+	(18, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste@hotmail.com', 'teste', 'N', 0),
+	(19, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 1),
+	(20, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 0),
+	(21, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 0),
+	(24, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 0),
+	(25, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 0),
+	(26, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 0),
+	(27, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 0),
+	(28, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 0),
+	(29, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(31, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(32, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(33, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(34, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(35, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(36, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(37, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(38, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(39, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(40, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(41, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(42, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(43, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(44, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(45, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(46, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(47, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(48, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(49, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(50, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(51, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(52, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(53, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(54, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(55, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(56, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(57, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(58, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(59, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(60, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(61, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(62, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(63, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(64, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
+	(65, 'teste3123', 'teste123', 'teste12312', '2025-07-07', 1, 1, 'teste12312', 'tesste123123', 'N', 0),
+	(66, 'marcos antonio', '012365478952', '01236654', '2025-07-01', 0, 1, 'teste', 'tesste123123', 'M', 0),
+	(67, 'teste', 'trdyr', '123123', '2003-09-13', 0, 1, 'tesdte', '123321', 'M', 0),
+	(68, 'Amarindo ferreira', '01234567898', '0123546', '1996-06-13', 0, 1, 'amarindo@gmail.com', '69992134628', 'F', 0);
+
+-- Copiando estrutura para tabela webagenda.quartos
+DROP TABLE IF EXISTS `quartos`;
+CREATE TABLE IF NOT EXISTS `quartos` (
+  `id_quarto` int NOT NULL AUTO_INCREMENT,
+  `num_quarto` int DEFAULT NULL,
+  `descricao` varchar(250) DEFAULT NULL,
+  `status` int DEFAULT NULL,
+  `excluido` int DEFAULT NULL,
+  `imagem` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id_quarto`),
+  UNIQUE KEY `num_quarto` (`num_quarto`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Copiando dados para a tabela webagenda.quartos: ~12 rows (aproximadamente)
+INSERT IGNORE INTO `quartos` (`id_quarto`, `num_quarto`, `descricao`, `status`, `excluido`, `imagem`) VALUES
+	(1, 1, 'Suíte de Luxo', 0, 1, 'PossivelLogo.jpeg'),
+	(2, 2, 'suite', 0, 0, ''),
+	(3, 3, '1 cama solteiro', 0, 0, ''),
+	(5, 33333, 'teste12312', 0, 1, ''),
+	(6, 123, 'tste', 0, 1, ''),
+	(7, 4568, 'suite de premium plus', 0, 0, ''),
+	(8, 4123, 'testeste', 0, 1, NULL),
+	(9, 9663, 'ertwsef', 0, 1, NULL),
+	(10, 1452, 'o melhor quarto da casa', 0, 0, NULL),
+	(11, 44, 'sdfsd', 0, 1, NULL),
+	(12, 7676, 'ertert', 0, 0, NULL),
+	(13, 6262, 'um quarto qualquer', 0, 0, NULL);
 
 -- Copiando estrutura para tabela webagenda.reservas
+DROP TABLE IF EXISTS `reservas`;
 CREATE TABLE IF NOT EXISTS `reservas` (
   `id_reserva` int NOT NULL AUTO_INCREMENT,
   `id_pessoa` int NOT NULL DEFAULT '0',
   `tiporeserva` smallint DEFAULT '0',
-  `id_venda` int DEFAULT '0',
-  `horarioini` time DEFAULT '00:00:00',
-  `horariofin` time DEFAULT '00:00:00',
-  `quant` double DEFAULT '0',
+  `obs` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `horarioini` timestamp NULL DEFAULT NULL,
+  `horariofin` timestamp NULL DEFAULT NULL,
+  `quant_pessoas` double DEFAULT '0',
   `valor` double DEFAULT '0',
   `finalizado` smallint DEFAULT '0',
+  `excluido` int NOT NULL DEFAULT '0',
+  `data_reserva` date DEFAULT NULL,
+  `id_quarto` int DEFAULT NULL,
   PRIMARY KEY (`id_reserva`),
   KEY `FK__pessoas` (`id_pessoa`),
-  KEY `FK__venda` (`id_venda`),
+  KEY `FK_quarto` (`id_quarto`) USING BTREE,
   CONSTRAINT `FK__pessoas` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoas` (`id_pessoa`),
-  CONSTRAINT `FK__venda` FOREIGN KEY (`id_venda`) REFERENCES `venda` (`id_venda`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `FK_quarto` FOREIGN KEY (`id_quarto`) REFERENCES `quartos` (`id_quarto`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.reservas: ~0 rows (aproximadamente)
+-- Copiando dados para a tabela webagenda.reservas: ~5 rows (aproximadamente)
+INSERT IGNORE INTO `reservas` (`id_reserva`, `id_pessoa`, `tiporeserva`, `obs`, `horarioini`, `horariofin`, `quant_pessoas`, `valor`, `finalizado`, `excluido`, `data_reserva`, `id_quarto`) VALUES
+	(5, 1, 0, '0', '2025-09-15 03:35:00', '2025-10-15 03:35:00', 0, 150, 0, 0, '2025-08-20', 1),
+	(8, 1, 0, '0', '2025-09-15 03:18:00', '2025-09-15 03:18:00', 2, 500, 0, 1, '2025-09-14', 1),
+	(9, 1, 0, 'tudo normal por aqui. só que não', '2025-09-15 02:46:00', '2025-09-15 02:46:00', 1, 500, 0, 0, '2025-09-14', 2),
+	(10, 15, 0, 'vai chegar depois do horario de check-in', '2025-09-15 05:02:00', '2025-10-15 05:02:00', 1, 500, 0, 1, '2025-09-15', 7),
+	(11, 4, 0, '', '2025-09-15 05:07:00', '2025-09-20 05:07:00', 2, 200, 0, 0, '2025-09-15', 5);
 
 -- Copiando estrutura para tabela webagenda.usuarios
+DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id_usuario` int NOT NULL AUTO_INCREMENT,
-  `id_pessoa` int DEFAULT NULL,
   `nome` varchar(100) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `senha` varchar(100) DEFAULT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `senha` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `telefone` varchar(50) DEFAULT NULL,
+  `reset_token` varchar(64) DEFAULT NULL,
+  `token_expira_em` datetime DEFAULT NULL,
+  `excluido` int DEFAULT NULL,
+  `cpf` varchar(11) DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
-  KEY `FK_usuarios_pessoas` (`id_pessoa`),
-  CONSTRAINT `FK_usuarios_pessoas` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoas` (`id_pessoa`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.usuarios: ~4 rows (aproximadamente)
-INSERT IGNORE INTO `usuarios` (`id_usuario`, `id_pessoa`, `nome`, `email`, `senha`, `telefone`) VALUES
-	(1, NULL, '', 'mateuscoelhosoporo@gmail.com', 'mateus13', '69992134628'),
-	(2, NULL, '', 'mateuscoelhosoporo@gmail.com', 'mateus13', '69992134628'),
-	(3, NULL, '', 'mateuscoelhosoporo@gmail.com', 'mateus13', '69992134628'),
-	(4, NULL, 'Mateus Coelho', 'mateuscoelhosoporo@gmail.com', 'mat', '69992134628');
+-- Copiando dados para a tabela webagenda.usuarios: ~2 rows (aproximadamente)
+INSERT IGNORE INTO `usuarios` (`id_usuario`, `nome`, `email`, `senha`, `telefone`, `reset_token`, `token_expira_em`, `excluido`, `cpf`) VALUES
+	(6, 'Mateus Coelho Santos', 'mateuscoelhosoporo@gmail.com', '$2y$10$tzmcXNFzsy4wrOjSwVeLr.GOEafvquylA2d73CJIZ/H9BRq/8KmDm', '69992134628', NULL, NULL, 0, NULL),
+	(7, 'Mateus Coelho Santos', 'mateuscoelhosoporo@hotmail.com', '$2y$10$12RcMTKuiA6VBiqzfqy1q.XnNeCqHYEWrom/5vTXVr5DSvNes4UVe', '69992134628', NULL, NULL, 0, '02878024265');
 
 -- Copiando estrutura para tabela webagenda.venda
+DROP TABLE IF EXISTS `venda`;
 CREATE TABLE IF NOT EXISTS `venda` (
   `id_venda` int NOT NULL AUTO_INCREMENT,
   `id_cliente` int DEFAULT NULL,
