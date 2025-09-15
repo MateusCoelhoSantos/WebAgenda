@@ -1,4 +1,9 @@
 <?php
+// A forma correta e segura de garantir que a sessão está ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include_once("conexao.php"); 
 // A conexão com o banco será usada no processamento do login, não aqui.
 // É bom mantê-la se o seu 'agenda.php' espera essa inclusão.
 require 'conexao.php';
