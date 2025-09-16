@@ -1,6 +1,9 @@
 <?php
-session_start();
-include("conexao.php");
+// A forma correta e segura de garantir que a sessão está ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include_once("conexao.php"); 
 require '../vendor/autoload.php'; // Verifique se este caminho está correto!
 
 use PHPMailer\PHPMailer\PHPMailer;

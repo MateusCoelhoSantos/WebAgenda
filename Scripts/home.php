@@ -1,3 +1,10 @@
+<?php
+// A forma correta e segura de garantir que a sessão está ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include_once("conexao.php"); 
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>

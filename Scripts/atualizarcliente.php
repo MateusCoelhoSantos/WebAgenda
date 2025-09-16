@@ -1,7 +1,9 @@
 <?php
-// 1. Inicia a sessão para usar as mensagens de feedback
-session_start();
-include("conexao.php"); // Inclui seu arquivo de conexão
+// A forma correta e segura de garantir que a sessão está ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include_once("conexao.php"); 
 
 // 2. Bloco try-catch para tratamento de erros
 try {
