@@ -3,8 +3,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-include("conexao.php");
+include_once("conexao.php"); 
 
 $idreserva = $_GET['idreserva'] ?? 0;
 
@@ -110,7 +109,7 @@ if (!$reserva) {
 
                         <div class="text-end mt-4">
                             <a href="agenda.php?menuop=agendamento" class="btn btn-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-primary" name="alterar">Salvar Alterações</button>
+                            <button type="submit" class="btn btn-success" name="alterar">Salvar Alterações</button>
                         </div>
 
                     </form>
