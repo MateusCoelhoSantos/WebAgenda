@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Servidor:                     127.0.0.1
--- Versão do servidor:           8.0.30 - MySQL Community Server - GPL
+-- Versão do servidor:           8.4.3 - MySQL Community Server - GPL
 -- OS do Servidor:               Win64
--- HeidiSQL Versão:              12.1.0.6537
+-- HeidiSQL Versão:              12.8.0.6908
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `contato` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.contato: ~0 rows (aproximadamente)
+DELETE FROM `contato`;
 
 -- Copiando estrutura para tabela webagenda.endereco
 DROP TABLE IF EXISTS `endereco`;
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS `endereco` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.endereco: ~0 rows (aproximadamente)
+DELETE FROM `endereco`;
 
 -- Copiando estrutura para tabela webagenda.estoque
 DROP TABLE IF EXISTS `estoque`;
@@ -71,6 +73,7 @@ CREATE TABLE IF NOT EXISTS `estoque` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.estoque: ~0 rows (aproximadamente)
+DELETE FROM `estoque`;
 
 -- Copiando estrutura para tabela webagenda.grupo
 DROP TABLE IF EXISTS `grupo`;
@@ -81,6 +84,7 @@ CREATE TABLE IF NOT EXISTS `grupo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.grupo: ~0 rows (aproximadamente)
+DELETE FROM `grupo`;
 
 -- Copiando estrutura para tabela webagenda.itensvenda
 DROP TABLE IF EXISTS `itensvenda`;
@@ -97,6 +101,7 @@ CREATE TABLE IF NOT EXISTS `itensvenda` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.itensvenda: ~0 rows (aproximadamente)
+DELETE FROM `itensvenda`;
 
 -- Copiando estrutura para tabela webagenda.marca
 DROP TABLE IF EXISTS `marca`;
@@ -107,6 +112,7 @@ CREATE TABLE IF NOT EXISTS `marca` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.marca: ~0 rows (aproximadamente)
+DELETE FROM `marca`;
 
 -- Copiando estrutura para tabela webagenda.pessoas
 DROP TABLE IF EXISTS `pessoas`;
@@ -123,10 +129,11 @@ CREATE TABLE IF NOT EXISTS `pessoas` (
   `genero` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'M-Masculino, F-Feminino, N-Não Identificado',
   `excluido` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id_pessoa`)
-) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.pessoas: ~63 rows (aproximadamente)
-INSERT IGNORE INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `genero`, `excluido`) VALUES
+-- Copiando dados para a tabela webagenda.pessoas: ~64 rows (aproximadamente)
+DELETE FROM `pessoas`;
+INSERT INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `genero`, `excluido`) VALUES
 	(1, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'F', 0),
 	(2, 'Mateus Santos', '02878024265', '0001', '2007-09-13', 0, 1, 'Mateus@gmail.com', '69992235346', 'M', 1),
 	(4, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'M', 0),
@@ -135,8 +142,8 @@ INSERT IGNORE INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f
 	(8, 'roberto renato', '123', '123', '2024-05-26', 0, 1, 'robren@hotmail.com', '431123', 'F', 1),
 	(9, 'jose olivas', '567765', '43232', '2024-03-05', 0, 1, 'teste', 'teste', 'N', 1),
 	(10, 'paulinho pereira', '1233254', '123657', '2023-09-06', 0, 1, 'pereira@paulinho.com', 'treqwe', 'M', 0),
-	(11, 'atestado', 'amianto', 'eutanasia', '2024-02-16', 1, 1, 'jovem', 'magaiver', 'N', 0),
-	(12, 'abraco', '099876543123', '123345', '2024-01-24', 1, 1, 'jovem@gmail.com', '123321', 'F', 0),
+	(11, 'atestado', '00.099.876/5431-23', 'eutanasia', '2024-02-16', 1, 1, 'jovem@outlook.com', '', 'N', 0),
+	(12, 'abraco', '00.099.876/5431-23', '123345', '2024-01-24', 1, 1, 'jovem@gmail.com', '(69) 9 9223-5646', 'F', 0),
 	(13, 'amanda amorim', '1234', '1234', '2004-02-13', 1, 1, 'atualizado@atual.com', '431123', 'F', 1),
 	(14, 'jose olivas', '567765', '123657', '2024-05-26', 1, 1, 'jovem', '431123', 'M', 0),
 	(15, 'amanda amorim', '1234', '43232', '2024-04-03', 1, 1, 'atualizado@atual.com', '1231231213', 'F', 0),
@@ -187,9 +194,10 @@ INSERT IGNORE INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f
 	(63, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
 	(64, 'teste', 'teste', 'teste', '2025-07-02', 0, 1, 'teste', 'teste', 'M', 0),
 	(65, 'teste3123', 'teste123', 'teste12312', '2025-07-07', 1, 1, 'teste12312', 'tesste123123', 'N', 0),
-	(66, 'marcos antonio', '012365478952', '01236654', '2025-07-01', 0, 1, 'teste', 'tesste123123', 'M', 0),
+	(66, 'marcos antonio', '01236547895', '01236654', '2025-07-01', 0, 1, 'teste@hotmail.com', '123123', 'M', 0),
 	(67, 'teste', 'trdyr', '123123', '2003-09-13', 0, 1, 'tesdte', '123321', 'M', 0),
-	(68, 'Amarindo ferreira', '01234567898', '0123546', '1996-06-13', 0, 1, 'amarindo@gmail.com', '69992134628', 'F', 0);
+	(68, 'Amarindo ferreira', '01234567898', '0123546', '1996-06-13', 0, 1, 'amarindo@gmail.com', '69992134628', 'F', 0),
+	(69, 'Aparecida Barbosa', '12365478965', '12365', '2001-06-07', 0, 1, 'teste333@gmail.com', '69992134628', 'N', 0);
 
 -- Copiando estrutura para tabela webagenda.quartos
 DROP TABLE IF EXISTS `quartos`;
@@ -205,7 +213,8 @@ CREATE TABLE IF NOT EXISTS `quartos` (
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.quartos: ~12 rows (aproximadamente)
-INSERT IGNORE INTO `quartos` (`id_quarto`, `num_quarto`, `descricao`, `status`, `excluido`, `imagem`) VALUES
+DELETE FROM `quartos`;
+INSERT INTO `quartos` (`id_quarto`, `num_quarto`, `descricao`, `status`, `excluido`, `imagem`) VALUES
 	(1, 1, 'Suíte de Luxo', 0, 1, 'PossivelLogo.jpeg'),
 	(2, 2, 'suite', 0, 0, ''),
 	(3, 3, '1 cama solteiro', 0, 0, ''),
@@ -242,7 +251,8 @@ CREATE TABLE IF NOT EXISTS `reservas` (
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.reservas: ~5 rows (aproximadamente)
-INSERT IGNORE INTO `reservas` (`id_reserva`, `id_pessoa`, `tiporeserva`, `obs`, `horarioini`, `horariofin`, `quant_pessoas`, `valor`, `finalizado`, `excluido`, `data_reserva`, `id_quarto`) VALUES
+DELETE FROM `reservas`;
+INSERT INTO `reservas` (`id_reserva`, `id_pessoa`, `tiporeserva`, `obs`, `horarioini`, `horariofin`, `quant_pessoas`, `valor`, `finalizado`, `excluido`, `data_reserva`, `id_quarto`) VALUES
 	(5, 1, 0, '0', '2025-09-15 03:35:00', '2025-10-15 03:35:00', 0, 150, 0, 0, '2025-08-20', 1),
 	(8, 1, 0, '0', '2025-09-15 03:18:00', '2025-09-15 03:18:00', 2, 500, 0, 1, '2025-09-14', 1),
 	(9, 1, 0, 'tudo normal por aqui. só que não', '2025-09-15 02:46:00', '2025-09-15 02:46:00', 1, 500, 0, 0, '2025-09-14', 2),
@@ -261,14 +271,16 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `token_expira_em` datetime DEFAULT NULL,
   `excluido` int DEFAULT NULL,
   `cpf` varchar(11) DEFAULT NULL,
+  `foto_perfil` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.usuarios: ~2 rows (aproximadamente)
-INSERT IGNORE INTO `usuarios` (`id_usuario`, `nome`, `email`, `senha`, `telefone`, `reset_token`, `token_expira_em`, `excluido`, `cpf`) VALUES
-	(6, 'Mateus Coelho Santos', 'mateuscoelhosoporo@gmail.com', '$2y$10$tzmcXNFzsy4wrOjSwVeLr.GOEafvquylA2d73CJIZ/H9BRq/8KmDm', '69992134628', NULL, NULL, 0, NULL),
-	(7, 'Mateus Coelho Santos', 'mateuscoelhosoporo@hotmail.com', '$2y$10$12RcMTKuiA6VBiqzfqy1q.XnNeCqHYEWrom/5vTXVr5DSvNes4UVe', '69992134628', NULL, NULL, 0, '02878024265');
+DELETE FROM `usuarios`;
+INSERT INTO `usuarios` (`id_usuario`, `nome`, `email`, `senha`, `telefone`, `reset_token`, `token_expira_em`, `excluido`, `cpf`, `foto_perfil`) VALUES
+	(6, 'Mateus Coelho', 'mateuscoelhosoporo@gmail.com', '$2y$10$ySPcrKBLU0.NtOnF19B97eeVuPr41BSC0J.ztu0.oupzVkr719kRO', '69992134628', NULL, NULL, 0, '02878024265', '68cb2954abf9f_1758144852.jpg'),
+	(7, 'Mateus Coelho Santos', 'mateuscoelhosoporo@hotmail.com', '$2y$10$12RcMTKuiA6VBiqzfqy1q.XnNeCqHYEWrom/5vTXVr5DSvNes4UVe', '69992134628', NULL, NULL, 0, '02878024265', NULL);
 
 -- Copiando estrutura para tabela webagenda.venda
 DROP TABLE IF EXISTS `venda`;
@@ -286,6 +298,7 @@ CREATE TABLE IF NOT EXISTS `venda` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.venda: ~0 rows (aproximadamente)
+DELETE FROM `venda`;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
