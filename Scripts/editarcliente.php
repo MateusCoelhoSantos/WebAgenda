@@ -3,10 +3,10 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+include_once("conexao.php"); 
+include_once("funcoes.php"); // Inclui o arquivo com as funções de formatação
 
-include_once("conexao.php");
-
-// --- SEGURANÇA: Buscando dados com Prepared Statement ---
+// --- SEGURANÇA E COMPATIBILIDADE NA BUSCA DE DADOS ---
 $dados = null;
 try {
     $idcli = $_GET["idcli"] ?? null;
@@ -14,12 +14,33 @@ try {
         throw new Exception("ID do cliente não foi fornecido ou é inválido.");
     }
 
-    $sql = "SELECT * FROM pessoas WHERE id_pessoa = ?";
+    // A consulta está selecionando todas as colunas necessárias
+    $sql = "SELECT id_pessoa, nome, cpfcnpj, rgie, email, telefone, nasc, f_j, genero FROM pessoas WHERE id_pessoa = ?";
     $stmt = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($stmt, 'i', $idcli);
     mysqli_stmt_execute($stmt);
-    $rs = mysqli_stmt_get_result($stmt);
-    $dados = mysqli_fetch_assoc($rs);
+
+    // --- CÓDIGO CORRIGIDO AQUI ---
+    // "Amarramos" variáveis PHP diretamente às colunas do SELECT
+    mysqli_stmt_bind_result($stmt, $id_pessoa, $nome, $cpfcnpj, $rgie, $email, $telefone, $nasc, $f_j, $genero);
+    
+    // "Puxamos" os dados para dentro dessas variáveis
+    if (mysqli_stmt_fetch($stmt)) {
+        // Montamos o array de dados manualmente
+        $dados = [
+            'id_pessoa' => $id_pessoa,
+            'nome' => $nome,
+            'cpfcnpj' => $cpfcnpj,
+            'rgie' => $rgie,
+            'email' => $email,
+            'telefone' => $telefone,
+            'nasc' => $nasc,
+            'f_j' => $f_j,
+            'genero' => $genero
+        ];
+    }
+    mysqli_stmt_close($stmt);
+    // --- FIM DA CORREÇÃO ---
 
     if (!$dados) {
         throw new Exception("Cliente com o ID {$idcli} não encontrado.");
@@ -60,7 +81,7 @@ try {
 
                             <div class="col-md-6 mb-3">
                                 <label for="clicpfcnpj" class="form-label">CPF/CNPJ</label>
-                                <input type="text" class="form-control" id="clicpfcnpj" name="clicpfcnpj" value="<?= htmlspecialchars($dados["cpfcnpj"]) ?>" required>
+                                <input type="text" class="form-control" id="clicpfcnpj" name="clicpfcnpj" value="<?= htmlspecialchars(formatarCpfCnpj($dados["cpfcnpj"])) ?>" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -75,7 +96,7 @@ try {
 
                             <div class="col-md-6 mb-3">
                                 <label for="clitel" class="form-label">Telefone</label>
-                                <input type="text" class="form-control" id="clitel" name="clitel" value="<?= htmlspecialchars($dados["telefone"]) ?>">
+                                <input type="text" class="form-control" id="clitel" name="clitel" value="<?= htmlspecialchars(formatarTelefone($dados["telefone"])) ?>">
                             </div>
                             
                             <div class="col-md-6 mb-3">

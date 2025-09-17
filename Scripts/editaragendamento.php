@@ -3,7 +3,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include_once("conexao.php"); 
+include_once("conexao.php");
+include_once("funcoes.php"); // Inclui o arquivo com a função formatarCpfCnpj() 
 
 $idreserva = $_GET['idreserva'] ?? 0;
 
@@ -63,8 +64,8 @@ if (!$reserva) {
                         </div>
 
                         <div id="infoCliente" class="info-box">
-                            <p class="mb-1"><strong>CPF/CNPJ:</strong> <span id="cpfcnpj"><?= htmlspecialchars($reserva['cpfcnpj']) ?></span></p>
-                            <p class="mb-1"><strong>Telefone:</strong> <span id="telefone"><?= htmlspecialchars($reserva['telefone']) ?></span></p>
+                            <p class="mb-1"><strong>CPF/CNPJ:</strong> <span id="cpfcnpj"><?= htmlspecialchars(formatarCpfCnpj($reserva['cpfcnpj'])) ?></span></p>
+                            <p class="mb-1"><strong>Telefone:</strong> <span id="telefone"><?= htmlspecialchars(formatarTelefone($reserva['telefone'])) ?></span></p>
                             <p class="mb-0"><strong>Email:</strong> <span id="email"><?= htmlspecialchars($reserva['email']) ?></span></p>
                         </div>
 

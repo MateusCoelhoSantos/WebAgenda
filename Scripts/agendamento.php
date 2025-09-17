@@ -3,10 +3,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include_once("conexao.php"); 
-
-function formatarTelefone($telefone) { /* ... sua função ... */ }
-function formatarCpfCnpj($numero) { /* ... sua função ... */ }
+include_once("conexao.php");
+include_once("funcoes.php"); // Inclui o arquivo com a função formatarCpfCnpj() 
 
 // --- LÓGICA DE FILTRO ---
 // Detecta se o formulário foi enviado ou se é a carga inicial da página

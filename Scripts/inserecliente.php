@@ -5,8 +5,28 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include_once("conexao.php"); 
 
+include("funcoes.php"); // Inclui o arquivo com as novas funções
+
 // 2. Bloco try-catch para um tratamento de erros mais robusto
 try {
+    // ... (captura dos outros dados do POST) ...
+    $clicpfcnpj = $_POST["clicpfcnpj"];
+    
+    // LIMPA E VALIDA O CPF/CNPJ
+    $cpfCnpjLimpo = preg_replace('/\D/', '', $clicpfcnpj);
+    
+    $isCpf = strlen($cpfCnpjLimpo) == 11;
+    $isCnpj = strlen($cpfCnpjLimpo) == 14;
+
+    if ($isCpf && !validarCpf($cpfCnpjLimpo)) {
+        throw new Exception("O CPF informado é inválido.");
+    }
+    if ($isCnpj && !validarCnpj($cpfCnpjLimpo)) {
+        throw new Exception("O CNPJ informado é inválido.");
+    }
+    if (!$isCpf && !$isCnpj) {
+        throw new Exception("O documento deve ser um CPF (11 dígitos) ou CNPJ (14 dígitos).");
+    }
     // 3. Validação dos dados essenciais
     if (empty($_POST["clinome"]) || empty($_POST["clicpfcnpj"])) {
         throw new Exception("Nome e CPF/CNPJ são obrigatórios.");

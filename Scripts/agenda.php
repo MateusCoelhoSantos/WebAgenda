@@ -8,32 +8,27 @@ include_once("conexao.php");
 // --- INÍCIO DO BLOCO DE AUTENTICAÇÃO ---
 
 // Verifica se o formulário de login foi enviado
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usuario'])) {
     
-    $usuario = $_POST['email'];
+    $usuario = $_POST['usuario'];
     $senha_digitada = $_POST['senha'];
 
-    // 1. Busca o usuário no banco de dados de forma segura
-    // Usaremos a tabela 'usuarios' como exemplo
-    $sql = "SELECT id_usuario, nome, senha FROM usuarios WHERE (email = ? OR senha = ?) AND excluido = 0";
+    // 1. ADICIONE 'foto_perfil' AQUI
+    $sql = "SELECT id_usuario, nome, senha, foto_perfil FROM usuarios WHERE (usuario = ? OR email = ?) AND excluido = 0";
     $stmt = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($stmt, 'ss', $usuario, $usuario);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     $user = mysqli_fetch_assoc($result);
 
-    // 2. Verifica se o usuário existe E se a senha está correta
     if ($user && password_verify($senha_digitada, $user['senha'])) {
-        // --- SUCESSO NO LOGIN ---
-
-        // 3. Regenera a sessão para segurança (previne session fixation)
         session_regenerate_id(true);
 
-        // 4. Guarda os dados do usuário na sessão
         $_SESSION['user_id'] = $user['id_usuario'];
         $_SESSION['user_name'] = $user['nome'];
+        // 2. SALVE A FOTO NA SESSÃO AQUI
+        $_SESSION['user_photo'] = $user['foto_perfil']; 
         
-        // Redireciona para a página principal do sistema (dashboard)
         header("Location: agenda.php?menuop=home");
         exit();
 
@@ -57,10 +52,6 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: index.php?menuop=login");
     exit();
 }
-// --- FIM DA PROTEÇÃO DE PÁGINA ---
-
-// Se o código chegou até aqui, significa que o usuário está logado.
-// Agora você pode carregar o resto da sua página de agenda.
 ?>
 
 <!DOCTYPE html>
@@ -74,6 +65,22 @@ if (!isset($_SESSION['user_id'])) {
 
 
 </head>
+
+<header>
+    <nav class="navbar navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral" aria-controls="menuLateral">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <a class="navbar-brand mx-auto" href="agenda.php?menuop=home">WebAgenda</a>
+            
+            <div class="navbar-toggler" style="visibility: hidden;">
+                <span class="navbar-toggler-icon"></span>
+            </div>
+        </div>
+    </nav>
+</header>
 <body>
     <?php
         // Inclui a estrutura do menu lateral oculto
@@ -145,6 +152,9 @@ if (!isset($_SESSION['user_id'])) {
                     break;  
                 case 'excluircliente':
                     include("excluircliente.php");
+                    break; 
+                case 'perfil':
+                    include("perfil.php");
                     break;                   
                 default:
                 include("agendamento.php");
@@ -154,6 +164,28 @@ if (!isset($_SESSION['user_id'])) {
         
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php
+// Este bloco verifica se existe uma mensagem na sessão
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    ?>
+    <script>
+        // Dispara o pop-up do SweetAlert2
+        Swal.fire({
+            icon: '<?= $message['type'] ?>', // 'success' ou 'error'
+            title: '<?= $message['text'] ?>',
+            showConfirmButton: false,
+            timer: 2500 
+        });
+    </script>
+    <?php
+    // Limpa a mensagem da sessão para que ela não apareça novamente
+    unset($_SESSION['message']);
+}
+?>
+
 </body>
 </html>

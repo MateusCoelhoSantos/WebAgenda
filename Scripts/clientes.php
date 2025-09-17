@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include_once("conexao.php"); 
+include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -15,14 +16,8 @@ include_once("conexao.php");
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
-        /* Alinha verticalmente o conteúdo da tabela, especialmente os ícones */
-        .table td, .table th {
-            vertical-align: middle;
-        }
-        .btn-icon {
-            padding: .375rem .5rem;
-            font-size: 1rem;
-        }
+        .table td, .table th { vertical-align: middle; }
+        .btn-icon { padding: .375rem .5rem; font-size: 1rem; }
     </style>
 </head>
 <body style="background-color: #f0f2f5;">
@@ -62,21 +57,20 @@ include_once("conexao.php");
                             <th class="ps-3">ID</th>
                             <th>Nome</th>
                             <th>CPF/CNPJ</th>
-                            <th>Nascimento</th>
-                            <th>Tipo</th>
+                            <th>Telefone</th> <th>Tipo</th>
                             <th>Gênero</th>
                             <th class="text-end pe-3">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        // SEGURANÇA: SQL com Prepared Statements
                         $quantidade = 10;
                         $pagina = (isset($_GET['pagina'])) ? (int)$_GET['pagina'] : 1;
                         $inicio = ($quantidade * $pagina) - $quantidade;
                         $pesquisa = $_POST["pesquisa"] ?? "";
 
-                        $sql = "SELECT *, 
+                        // Adicionei a busca do telefone na query, caso não estivesse
+                        $sql = "SELECT id_pessoa, nome, cpfcnpj, telefone, nasc, f_j, genero, 
                                 CASE WHEN f_j = 0 THEN 'Pessoa Física' WHEN f_j = 1 THEN 'Pessoa Jurídica' END AS 'tipagem_pessoa',
                                 CASE WHEN genero = 'M' THEN 'Masculino' WHEN genero = 'F' THEN 'Feminino' WHEN genero = 'N' THEN 'Não Informado' END AS 'genero_texto',
                                 DATE_FORMAT(nasc, '%d/%m/%Y') as data_nasc
@@ -93,15 +87,27 @@ include_once("conexao.php");
 
                         if (mysqli_num_rows($RS) > 0) {
                             foreach ($RS as $dados) {
-                                // VISUAL: Define cores e textos para os badges
-                                $badge_genero_cor = $dados['genero'] == 'M' ? 'bg-info' : ($dados['genero'] == 'F' ? 'bg-danger' : 'bg-secondary');
-                                $badge_pessoa_cor = $dados['f_j'] == 0 ? 'bg-primary' : 'bg-dark';
+                                // CÓDIGO NOVO COM TONS PASTEL AINDA MAIS SUAVES
+
+                                // Define a cor do badge de Gênero
+                                $badge_genero_cor = 'bg-secondary-subtle text-secondary-emphasis'; // Padrão: Cinza bem claro
+                                if ($dados['genero'] == 'M') {
+                                    $badge_genero_cor = 'bg-primary-subtle text-primary-emphasis'; // Azul pastel
+                                } elseif ($dados['genero'] == 'F') {
+                                    $badge_genero_cor = 'bg-danger-subtle text-danger-emphasis'; // Rosa / Vermelho pastel
+                                }
+
+                                // Define a cor do badge de Tipo de Pessoa
+                                $badge_pessoa_cor = ($dados['f_j'] == 0) 
+                                    ? 'bg-success-subtle text-success-emphasis' // Verde pastel
+                                    : 'bg-dark-subtle text-dark-emphasis';      // Grafite bem claro
 
                                 echo "<tr>";
                                 echo "<td class='ps-3'>" . htmlspecialchars($dados['id_pessoa']) . "</td>";
                                 echo "<td>" . htmlspecialchars($dados['nome']) . "</td>";
-                                echo "<td>" . htmlspecialchars($dados['cpfcnpj']) . "</td>";
-                                echo "<td>" . htmlspecialchars($dados['data_nasc']) . "</td>";
+                                // APLICAÇÃO DA FORMATAÇÃO
+                                echo "<td>" . htmlspecialchars(formatarCpfCnpj($dados['cpfcnpj'])) . "</td>";
+                                echo "<td>" . htmlspecialchars(formatarTelefone($dados['telefone'])) . "</td>";
                                 echo "<td><span class='badge " . $badge_pessoa_cor . "'>" . htmlspecialchars($dados['tipagem_pessoa']) . "</span></td>";
                                 echo "<td><span class='badge " . $badge_genero_cor . "'>" . htmlspecialchars($dados['genero_texto']) . "</span></td>";
                                 echo "<td class='text-end pe-3'>
@@ -109,7 +115,8 @@ include_once("conexao.php");
                                             <i class='bi bi-pencil-square'></i>
                                         </a>
                                         <a href='agenda.php?menuop=excluircliente&idcli=" . $dados['id_pessoa'] . "' class='btn btn-outline-danger btn-icon btn-excluir' title='Excluir'>
-                                        <i class='bi bi-trash3'></i></a>
+                                            <i class='bi bi-trash3'></i>
+                                        </a>
                                       </td>";
                                 echo "</tr>";
                             }
@@ -123,7 +130,6 @@ include_once("conexao.php");
         </div>
 
         <?php
-        // SEGURANÇA: Contagem total também com Prepared Statements
         $sqltotal = "SELECT COUNT(id_pessoa) as total FROM pessoas WHERE (excluido <> 1) AND tipopessoa = 1 AND (id_pessoa = ? OR nome LIKE ?)";
         $stmt_total = mysqli_prepare($conexao, $sqltotal);
         mysqli_stmt_bind_param($stmt_total, 'ss', $pesquisa, $termo_pesquisa);
@@ -140,17 +146,12 @@ include_once("conexao.php");
             <nav aria-label="Navegação da página">
                 <ul class="pagination mb-0">
                     <?php
-                    // Botão Primeira
                     echo "<li class='page-item " . ($pagina == 1 ? 'disabled' : '') . "'><a class='page-link' href='?menuop=clientes&pagina=1'><i class='bi bi-chevron-bar-left'></i></a></li>";
-                    
-                    // Botões numéricos
                     for ($i = 1; $i <= $totalpagina; $i++) {
                         if ($i >= ($pagina - 2) && $i <= ($pagina + 2)) {
                             echo "<li class='page-item " . ($i == $pagina ? 'active' : '') . "'><a class='page-link' href='?menuop=clientes&pagina=$i'>$i</a></li>";
                         }
                     }
-                    
-                    // Botão Última
                     echo "<li class='page-item " . ($pagina == $totalpagina ? 'disabled' : '') . "'><a class='page-link' href='?menuop=clientes&pagina=$totalpagina'><i class='bi bi-chevron-bar-right'></i></a></li>";
                     ?>
                 </ul>
@@ -161,17 +162,14 @@ include_once("conexao.php");
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-// SCRIPT 1: Pop-up de confirmação para exclusão
 document.addEventListener('DOMContentLoaded', function () {
+    // Pop-up de confirmação para exclusão
     const deleteButtons = document.querySelectorAll('.btn-excluir');
-
     deleteButtons.forEach(button => {
         button.addEventListener('click', function (event) {
             event.preventDefault(); 
             const deleteUrl = this.href;
-
             Swal.fire({
                 title: 'Você tem certeza?',
                 text: "Esta ação não poderá ser revertida!",
@@ -190,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// SCRIPT 2: Pop-up de feedback (sucesso/erro) após uma ação
+// Pop-up de feedback (sucesso/erro)
 <?php
 if (isset($_SESSION['message'])) {
     $message = $_SESSION['message'];

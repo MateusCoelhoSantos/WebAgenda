@@ -50,7 +50,8 @@ include_once("conexao.php");
                                 <label for="cpf" class="form-label">CPF</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
-                                    <input type="text" class="form-control" id="cpf" name="cpf" required>
+                                    <input type="text" class="form-control" id="cpf" name="cpf" required placeholder="000.000.000-00" maxlength="14">
+                                    <div class="invalid-feedback">CPF inválido.</div>
                                 </div>
                             </div>
                         </div>
@@ -68,7 +69,7 @@ include_once("conexao.php");
                                 <label for="telefone" class="form-label">Telefone</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
-                                    <input type="text" class="form-control" id="telefone" name="telefone" required>
+                                    <input type="text" class="form-control" id="telefone" name="telefone" required placeholder="(00) 00000-0000" maxlength="15">
                                 </div>
                             </div>
                         </div>
@@ -129,5 +130,68 @@ include_once("conexao.php");
         }
     ?>
 
+    <script>
+        // Função de validação de CPF em JavaScript
+        function validarCPF_JS(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+            let soma = 0, resto;
+            for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            resto = (soma * 10) % 11;
+            if ((resto === 10) || (resto === 11)) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+            soma = 0;
+            for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            resto = (soma * 10) % 11;
+            if ((resto === 10) || (resto === 11)) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+            return true;
+        }
+
+        // Função para aplicar máscara de telefone
+        function mascaraTelefone(valor) {
+            valor = valor.replace(/\D/g, "");
+            valor = valor.replace(/^(\d{2})(\d)/g, "($1) $2");
+            valor = valor.replace(/(\d)(\d{4})$/, "$1-$2");
+            return valor;
+        }
+
+        // Função para aplicar máscara de CPF
+        function mascaraCPF(valor) {
+            valor = valor.replace(/\D/g, "");
+            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+            valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            return valor;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const inputCPF = document.getElementById('cpf');
+            const inputTelefone = document.getElementById('telefone');
+
+            // Event listener para o campo de CPF
+            inputCPF.addEventListener('input', () => {
+                inputCPF.value = mascaraCPF(inputCPF.value);
+                
+                const cpfLimpo = inputCPF.value.replace(/\D/g, '');
+                if (cpfLimpo.length === 11) {
+                    if (validarCPF_JS(cpfLimpo)) {
+                        inputCPF.classList.add('is-valid');
+                        inputCPF.classList.remove('is-invalid');
+                    } else {
+                        inputCPF.classList.add('is-invalid');
+                        inputCPF.classList.remove('is-valid');
+                    }
+                } else {
+                    inputCPF.classList.remove('is-valid', 'is-invalid');
+                }
+            });
+
+            // Event listener para o campo de Telefone
+            inputTelefone.addEventListener('input', () => {
+                inputTelefone.value = mascaraTelefone(inputTelefone.value);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include_once("conexao.php"); 
+include_once("funcoes.php"); // Inclui o arquivo com a função formatarCpfCnpj()
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -104,13 +105,32 @@ include_once("conexao.php");
 </div>
 
 <script>
+function formatarCpfCnpjJS(numero) {
+    const numeroLimpo = String(numero).replace(/\D/g, '');
+    if (numeroLimpo.length === 11) {
+        return numeroLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    } else if (numeroLimpo.length === 14) {
+        return numeroLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    } else {
+        return numero;
+    }
+}
+
+function formatarTelefoneJS(telefone) {
+    const numeroLimpo = String(telefone).replace(/\D/g, '');
+    if (numeroLimpo.length === 11) {
+        return numeroLimpo.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1) $2 $3-$4');
+    } else if (numeroLimpo.length === 10) {
+        return numeroLimpo.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    } else {
+        return telefone;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // --- LÓGICA PARA DEFINIR A DATA E HORA LOCAL DO USUÁRIO ---
-    // Seleciona os inputs de data
     const inputHorarioIni = document.getElementById('horarioini');
     const inputHorarioFin = document.getElementById('horariofin');
-
-    // Cria a data/hora atual formatada para o input
     const agora = new Date();
     const ano = agora.getFullYear();
     const mes = String(agora.getMonth() + 1).padStart(2, '0');
@@ -118,8 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const hora = String(agora.getHours()).padStart(2, '0');
     const minuto = String(agora.getMinutes()).padStart(2, '0');
     const dataHoraFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
-
-    // Atribui o valor aos campos
     inputHorarioIni.value = dataHoraFormatada;
     inputHorarioFin.value = dataHoraFormatada;
 
@@ -144,8 +162,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     item.addEventListener("click", () => {
                         nomeCliente.value = cliente.nome;
                         document.getElementById("codcliente").value = cliente.id_pessoa;
-                        document.getElementById("cpfcnpj").innerText = cliente.cpfcnpj;
-                        document.getElementById("telefone").innerText = cliente.telefone;
+                        // --- LINHAS ALTERADAS AQUI ---
+                        document.getElementById("cpfcnpj").innerText = formatarCpfCnpjJS(cliente.cpfcnpj);
+                        document.getElementById("telefone").innerText = formatarTelefoneJS(cliente.telefone);
+                        // --- FIM DAS LINHAS ALTERADAS ---
                         document.getElementById("email").innerText = cliente.email;
                         infoCliente.classList.remove("d-none");
                         listaClientes.innerHTML = "";

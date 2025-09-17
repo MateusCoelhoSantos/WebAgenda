@@ -7,6 +7,20 @@ include_once("conexao.php");
 
 // 2. Bloco try-catch para um tratamento de erros mais robusto
 try {
+     // ... captura dos outros dados ...
+    $cpf = $_POST['cpf'] ?? '';
+    $senha = $_POST['senha'] ?? '';
+    // ...
+
+    // Validação dos dados
+    if (empty($nome) || empty($email) || empty($cpf) || empty($senha)) {
+        throw new Exception("Todos os campos são obrigatórios.");
+    }
+    // --- ADICIONE ESTA VALIDAÇÃO ---
+    if (!validarCpf($cpf)) {
+        throw new Exception("O CPF informado é inválido.");
+    }
+    
     // Captura os dados do POST
     $nome           = $_POST['nome'] ?? '';
     $email          = $_POST['email'] ?? '';
