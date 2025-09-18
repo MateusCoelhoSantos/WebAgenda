@@ -81,7 +81,8 @@ try {
 
                             <div class="col-md-6 mb-3">
                                 <label for="clicpfcnpj" class="form-label">CPF/CNPJ</label>
-                                <input type="text" class="form-control" id="clicpfcnpj" name="clicpfcnpj" value="<?= htmlspecialchars(formatarCpfCnpj($dados["cpfcnpj"])) ?>" required>
+                                <input type="text" class="form-control" id="clicpfcnpj" name="clicpfcnpj" value="<?= htmlspecialchars(formatarCpfCnpj($dados["cpfcnpj"])) ?>" maxlength="18">
+                                <div class="invalid-feedback">CPF ou CNPJ inválido.</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -96,7 +97,7 @@ try {
 
                             <div class="col-md-6 mb-3">
                                 <label for="clitel" class="form-label">Telefone</label>
-                                <input type="text" class="form-control" id="clitel" name="clitel" value="<?= htmlspecialchars(formatarTelefone($dados["telefone"])) ?>">
+                                <input type="text" class="form-control" id="clitel" name="clitel" value="<?= htmlspecialchars(formatarTelefone($dados["telefone"])) ?>" maxlength="15">
                             </div>
                             
                             <div class="col-md-6 mb-3">
@@ -145,6 +146,107 @@ try {
         </div>
     </div>
 </div>
+
+<script>
+// Funções de validação em JavaScript (CPF e CNPJ)
+function validarCPF_JS(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    let soma = 0, resto;
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+    soma = 0;
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+    return true;
+}
+
+function validarCNPJ_JS(cnpj) {
+    cnpj = cnpj.replace(/\D/g, '');
+    if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
+    let tamanho = cnpj.length - 2, numeros = cnpj.substring(0, tamanho), digitos = cnpj.substring(tamanho), soma = 0, pos = tamanho - 7;
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+    }
+    let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado != digitos.charAt(0)) return false;
+    tamanho = tamanho + 1;
+    numeros = cnpj.substring(0, tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+    }
+    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado != digitos.charAt(1)) return false;
+    return true;
+}
+
+// Funções de máscara
+function mascaraCpfCnpj(valor) {
+    valor = valor.replace(/\D/g, "");
+    if (valor.length > 11) {
+        valor = valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
+    } else {
+        valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
+    }
+    return valor;
+}
+
+function mascaraTelefone(valor) {
+    valor = valor.replace(/\D/g, "");
+    valor = valor.replace(/^(\d{2})(\d)/g, "($1) $2");
+    valor = valor.replace(/(\d)(\d{4})$/, "$1-$2");
+    return valor;
+}
+
+// Lógica principal
+document.addEventListener("DOMContentLoaded", () => {
+    const inputCpfCnpj = document.getElementById('clicpfcnpj');
+    const inputTelefone = document.getElementById('clitel');
+
+    const validarEFormatarCpfCnpj = (input) => {
+        const valorLimpo = input.value.replace(/\D/g, '');
+        let valido = false;
+        if (valorLimpo.length === 11) {
+            valido = validarCPF_JS(valorLimpo);
+        } else if (valorLimpo.length === 14) {
+            valido = validarCNPJ_JS(valorLimpo);
+        }
+
+        if (valorLimpo.length > 0) {
+            if (valido) {
+                input.classList.add('is-valid');
+                input.classList.remove('is-invalid');
+            } else {
+                input.classList.add('is-invalid');
+                input.classList.remove('is-valid');
+            }
+        } else {
+            input.classList.remove('is-valid', 'is-invalid');
+        }
+    };
+    
+    // Valida o dado que já veio do banco de dados
+    validarEFormatarCpfCnpj(inputCpfCnpj); 
+    
+    // Adiciona o listener para quando o usuário digitar
+    inputCpfCnpj.addEventListener('input', () => {
+        inputCpfCnpj.value = mascaraCpfCnpj(inputCpfCnpj.value);
+        validarEFormatarCpfCnpj(inputCpfCnpj);
+    });
+
+    inputTelefone.addEventListener('input', () => {
+        inputTelefone.value = mascaraTelefone(inputTelefone.value);
+    });
+});
+</script>
 
 </body>
 </html>

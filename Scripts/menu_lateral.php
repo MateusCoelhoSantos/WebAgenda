@@ -38,7 +38,7 @@
                     <img src="<?= $caminho_foto ?>" alt="Foto de Perfil" width="32" height="32" class="rounded-circle me-2">
                     <span>Olá, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Usuário') ?></span>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-dark">
+                <ul class="dropdown-menu dropdown-menu">
                     <li>
                         <a class="dropdown-item" href="agenda.php?menuop=perfil">
                             <i class="bi bi-person-gear me-2"></i> Meu Perfil
