@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `pessoas` (
   PRIMARY KEY (`id_pessoa`)
 ) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.pessoas: ~64 rows (aproximadamente)
+-- Copiando dados para a tabela webagenda.pessoas: ~63 rows (aproximadamente)
 DELETE FROM `pessoas`;
 INSERT INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `genero`, `excluido`) VALUES
 	(1, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'F', 0),
@@ -145,7 +145,7 @@ INSERT INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `t
 	(11, 'atestado', '00.099.876/5431-23', 'eutanasia', '2024-02-16', 1, 1, 'jovem@outlook.com', '', 'N', 0),
 	(12, 'abraco', '00.099.876/5431-23', '123345', '2024-01-24', 1, 1, 'jovem@gmail.com', '(69) 9 9223-5646', 'F', 0),
 	(13, 'amanda amorim', '1234', '1234', '2004-02-13', 1, 1, 'atualizado@atual.com', '431123', 'F', 1),
-	(14, 'jose olivas', '567765', '123657', '2024-05-26', 1, 1, 'jovem', '431123', 'M', 0),
+	(14, 'jose olivas', '567765', '123657', '2024-05-26', 1, 1, 'jovem@outlook.com', '431123', 'M', 0),
 	(15, 'amanda amorim', '1234', '43232', '2024-04-03', 1, 1, 'atualizado@atual.com', '1231231213', 'F', 0),
 	(16, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 1),
 	(17, 'teste', 'teste', 'teste', '2025-07-08', 0, 1, 'teste', 'teste', 'N', 1),
@@ -196,7 +196,7 @@ INSERT INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `t
 	(65, 'teste3123', 'teste123', 'teste12312', '2025-07-07', 1, 1, 'teste12312', 'tesste123123', 'N', 0),
 	(66, 'marcos antonio', '01236547895', '01236654', '2025-07-01', 0, 1, 'teste@hotmail.com', '123123', 'M', 0),
 	(67, 'teste', 'trdyr', '123123', '2003-09-13', 0, 1, 'tesdte', '123321', 'M', 0),
-	(68, 'Amarindo ferreira', '01234567898', '0123546', '1996-06-13', 0, 1, 'amarindo@gmail.com', '69992134628', 'F', 0),
+	(68, 'Amarindo ferreira', '012.345.678-98', '0123546', '1996-06-13', 0, 1, 'amarindo@gmail.com', '(69) 9 9213-4628', 'F', 0),
 	(69, 'Aparecida Barbosa', '12365478965', '12365', '2001-06-07', 0, 1, 'teste333@gmail.com', '69992134628', 'N', 0);
 
 -- Copiando estrutura para tabela webagenda.quartos
@@ -204,29 +204,54 @@ DROP TABLE IF EXISTS `quartos`;
 CREATE TABLE IF NOT EXISTS `quartos` (
   `id_quarto` int NOT NULL AUTO_INCREMENT,
   `num_quarto` int DEFAULT NULL,
+  `nome_quarto` varchar(100) NOT NULL,
   `descricao` varchar(250) DEFAULT NULL,
+  `capacidade_adultos` int NOT NULL DEFAULT '2',
+  `capacidade_criancas` int NOT NULL DEFAULT '0',
+  `preco_diaria` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `tem_wifi` tinyint(1) NOT NULL DEFAULT '1',
+  `tem_ar_condicionado` tinyint(1) NOT NULL DEFAULT '1',
+  `tem_tv` tinyint(1) NOT NULL DEFAULT '1',
   `status` int DEFAULT NULL,
   `excluido` int DEFAULT NULL,
-  `imagem` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id_quarto`),
   UNIQUE KEY `num_quarto` (`num_quarto`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.quartos: ~12 rows (aproximadamente)
+-- Copiando dados para a tabela webagenda.quartos: ~13 rows (aproximadamente)
 DELETE FROM `quartos`;
-INSERT INTO `quartos` (`id_quarto`, `num_quarto`, `descricao`, `status`, `excluido`, `imagem`) VALUES
-	(1, 1, 'Suíte de Luxo', 0, 1, 'PossivelLogo.jpeg'),
-	(2, 2, 'suite', 0, 0, ''),
-	(3, 3, '1 cama solteiro', 0, 0, ''),
-	(5, 33333, 'teste12312', 0, 1, ''),
-	(6, 123, 'tste', 0, 1, ''),
-	(7, 4568, 'suite de premium plus', 0, 0, ''),
-	(8, 4123, 'testeste', 0, 1, NULL),
-	(9, 9663, 'ertwsef', 0, 1, NULL),
-	(10, 1452, 'o melhor quarto da casa', 0, 0, NULL),
-	(11, 44, 'sdfsd', 0, 1, NULL),
-	(12, 7676, 'ertert', 0, 0, NULL),
-	(13, 6262, 'um quarto qualquer', 0, 0, NULL);
+INSERT INTO `quartos` (`id_quarto`, `num_quarto`, `nome_quarto`, `descricao`, `capacidade_adultos`, `capacidade_criancas`, `preco_diaria`, `tem_wifi`, `tem_ar_condicionado`, `tem_tv`, `status`, `excluido`) VALUES
+	(1, 1, '', 'Suíte de Luxo', 2, 0, 0.00, 1, 1, 1, 0, 1),
+	(2, 2, '', 'suite', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(3, 3, '', '1 cama solteiro', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(5, 33333, '', 'teste12312', 2, 0, 0.00, 1, 1, 1, 0, 1),
+	(6, 123, '', 'tste', 2, 0, 0.00, 1, 1, 1, 0, 1),
+	(7, 4568, '', 'suite de premium plus', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(8, 4123, '', 'testeste', 2, 0, 0.00, 1, 1, 1, 0, 1),
+	(9, 9663, '', 'ertwsef', 2, 0, 0.00, 1, 1, 1, 0, 1),
+	(10, 1452, '', 'o melhor quarto da casa', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(11, 44, '', 'sdfsd', 2, 0, 0.00, 1, 1, 1, 0, 1),
+	(12, 7676, '', 'ertert', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(13, 6262, '', 'um quarto qualquer', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(14, 512, 'Quarto casal', '', 2, 0, 250.00, 1, 1, 1, 0, 0);
+
+-- Copiando estrutura para tabela webagenda.quarto_imagens
+DROP TABLE IF EXISTS `quarto_imagens`;
+CREATE TABLE IF NOT EXISTS `quarto_imagens` (
+  `id_imagem` int NOT NULL AUTO_INCREMENT,
+  `id_quarto` int NOT NULL,
+  `nome_arquivo` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_imagem`),
+  KEY `id_quarto` (`id_quarto`),
+  CONSTRAINT `quarto_imagens_ibfk_1` FOREIGN KEY (`id_quarto`) REFERENCES `quartos` (`id_quarto`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Copiando dados para a tabela webagenda.quarto_imagens: ~0 rows (aproximadamente)
+DELETE FROM `quarto_imagens`;
+INSERT INTO `quarto_imagens` (`id_imagem`, `id_quarto`, `nome_arquivo`) VALUES
+	(1, 14, '68cc75f465bba_1758230004.jpg'),
+	(2, 14, '68cc75f466286_1758230004.jpg'),
+	(3, 14, '68cc75f46678b_1758230004.png');
 
 -- Copiando estrutura para tabela webagenda.reservas
 DROP TABLE IF EXISTS `reservas`;
@@ -279,7 +304,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 -- Copiando dados para a tabela webagenda.usuarios: ~2 rows (aproximadamente)
 DELETE FROM `usuarios`;
 INSERT INTO `usuarios` (`id_usuario`, `nome`, `email`, `senha`, `telefone`, `reset_token`, `token_expira_em`, `excluido`, `cpf`, `foto_perfil`) VALUES
-	(6, 'Mateus Coelho', 'mateuscoelhosoporo@gmail.com', '$2y$10$ySPcrKBLU0.NtOnF19B97eeVuPr41BSC0J.ztu0.oupzVkr719kRO', '69992134628', NULL, NULL, 0, '02878024265', '68cb2954abf9f_1758144852.jpg'),
+	(6, 'Mateus Coelho', 'mateuscoelhosoporo@gmail.com', '$2y$10$ySPcrKBLU0.NtOnF19B97eeVuPr41BSC0J.ztu0.oupzVkr719kRO', '69992134628', NULL, NULL, 0, '02878024265', '68cc70f71ff4d_1758228727.jpg'),
 	(7, 'Mateus Coelho Santos', 'mateuscoelhosoporo@hotmail.com', '$2y$10$12RcMTKuiA6VBiqzfqy1q.XnNeCqHYEWrom/5vTXVr5DSvNes4UVe', '69992134628', NULL, NULL, 0, '02878024265', NULL);
 
 -- Copiando estrutura para tabela webagenda.venda
