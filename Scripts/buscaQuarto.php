@@ -11,7 +11,7 @@ $sql = "SELECT
             GROUP_CONCAT(qi.nome_arquivo) as imagens
         FROM quartos q
         LEFT JOIN quarto_imagens qi ON q.id_quarto = qi.id_quarto
-        WHERE q.excluido = 0 AND (q.num_quarto LIKE ? OR q.nome_quarto LIKE ?)
+        WHERE q.excluido = 0 AND q.status <> 1 AND (q.num_quarto LIKE ? OR q.nome_quarto LIKE ?)
         GROUP BY q.id_quarto
         LIMIT 10";
 

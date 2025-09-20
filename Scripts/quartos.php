@@ -71,17 +71,19 @@ include_once("funcoes.php");
                         $inicio = ($quantidade * $pagina) - $quantidade;
                         $pesquisa = $_POST["qrtpesquisa"] ?? "";
 
-                        // CONSULTA SQL ATUALIZADA PARA BUSCAR NOVOS CAMPOS E PESQUISAR NO CAMPO CORRETO
-                        $sql = "SELECT id_quarto, num_quarto, nome_quarto, capacidade_adultos, capacidade_criancas, preco_diaria, status,
+                        // --- 1. CONSULTA SQL OTIMIZADA ---
+                        // Busca a imagem principal em uma única consulta usando uma subquery
+                        $sql = "SELECT q.id_quarto, q.num_quarto, q.nome_quarto, q.capacidade_adultos, q.capacidade_criancas, q.preco_diaria, q.status,
+                                    (SELECT qi.nome_arquivo FROM quarto_imagens qi WHERE qi.id_quarto = q.id_quarto LIMIT 1) as imagem_principal,
                                     CASE 
                                         when status = 0 then 'Disponível' 
                                         when status = 1 then 'Ocupado'
                                         when status = 2 then 'Limpeza'
                                         when status = 3 then 'Manutenção'
                                     END as status_texto 
-                                FROM quartos 
-                                WHERE excluido <> 1 AND (num_quarto LIKE ? OR nome_quarto LIKE ?) 
-                                ORDER BY CAST(num_quarto AS UNSIGNED) ASC
+                                FROM quartos q
+                                WHERE q.excluido <> 1 AND (q.num_quarto = ? OR q.nome_quarto LIKE ?) 
+                                ORDER BY CAST(q.num_quarto AS UNSIGNED) ASC
                                 LIMIT ?, ?";
                         
                         $stmt = mysqli_prepare($conexao, $sql);
@@ -92,31 +94,28 @@ include_once("funcoes.php");
 
                         if (mysqli_num_rows($RS) > 0) {
                             foreach ($RS as $dados) {
-                                // DENTRO DO LOOP: Busca a imagem principal do quarto
-                                $sql_img = "SELECT nome_arquivo FROM quarto_imagens WHERE id_quarto = ? LIMIT 1";
-                                $stmt_img = mysqli_prepare($conexao, $sql_img);
-                                mysqli_stmt_bind_param($stmt_img, 'i', $dados['id_quarto']);
-                                mysqli_stmt_execute($stmt_img);
-                                $rs_img = mysqli_stmt_get_result($stmt_img);
-                                $imagem = mysqli_fetch_assoc($rs_img);
-
-                                $caminho_foto = "../Imagens/Quartos/" . ($imagem['nome_arquivo'] ?? 'quarto-sem-foto.png');
-                                if (empty($imagem['nome_arquivo']) || !file_exists($caminho_foto)) {
+                                $caminho_foto = "../Imagens/Quartos/" . ($dados['imagem_principal'] ?? 'quarto-sem-foto.png');
+                                if (empty($dados['imagem_principal']) || !file_exists($caminho_foto)) {
                                     $caminho_foto = "../Imagens/Quartos/quarto-sem-foto.png";
                                 }
 
-                                $badge_cor = $dados['status'] == 0 ? 'bg-success' : 'bg-secondary';
+                                // --- 2. BADGES DE STATUS COM MAIS CORES ---
+                                $badge_cor = 'bg-secondary'; // Cor padrão
+                                switch ($dados['status']) {
+                                    case 0: $badge_cor = 'bg-success'; break; // Disponível
+                                    case 1: $badge_cor = 'bg-danger'; break;  // Ocupado
+                                    case 2: $badge_cor = 'bg-info'; break;    // Limpeza
+                                    case 3: $badge_cor = 'bg-warning'; break; // Manutenção
+                                }
                                 ?>
                                 <tr>
-                                    <td class="text-center">
-                                        <img src="<?= $caminho_foto ?>" alt="<?= htmlspecialchars($dados['nome_quarto']) ?>" class="room-thumbnail">
-                                    </td>
+                                    <td class="text-center"><img src="<?= $caminho_foto ?>" alt="<?= htmlspecialchars($dados['nome_quarto']) ?>" class="room-thumbnail"></td>
                                     <td><?= htmlspecialchars($dados['num_quarto']) ?></td>
                                     <td><?= htmlspecialchars($dados['nome_quarto']) ?></td>
                                     <td>
                                         <i class="bi bi-person-fill"></i> <?= $dados['capacidade_adultos'] ?>
                                         <?php if($dados['capacidade_criancas'] > 0): ?>
-                                            + <i class="bi bi-person"></i> <?= $dados['capacidade_criancas'] ?>
+                                            + <i class="bi bi-person" style="font-size: 0.8em;"></i> <?= $dados['capacidade_criancas'] ?>
                                         <?php endif; ?>
                                     </td>
                                     <td>R$ <?= number_format($dados['preco_diaria'], 2, ',', '.') ?></td>
@@ -129,7 +128,6 @@ include_once("funcoes.php");
                                 <?php
                             }
                         } else {
-                            // Colspan atualizado para 7 colunas
                             echo "<tr><td colspan='7' class='text-center p-4'>Nenhum quarto encontrado.</td></tr>";
                         }
                         ?>
@@ -139,31 +137,29 @@ include_once("funcoes.php");
         </div>
 
         <?php
-        $sqltotal = "SELECT COUNT(id_quarto) as total FROM quartos WHERE excluido <> 1 AND (num_quarto LIKE ? OR nome_quarto LIKE ?)";
+        // Lógica da paginação (corrigida para ser mais precisa com a busca)
+        $sqltotal = "SELECT COUNT(id_quarto) as total FROM quartos WHERE excluido <> 1 AND (num_quarto = ? OR nome_quarto LIKE ?)";
         $stmt_total = mysqli_prepare($conexao, $sqltotal);
         mysqli_stmt_bind_param($stmt_total, 'ss', $pesquisa, $termo_pesquisa);
         mysqli_stmt_execute($stmt_total);
-        $rs_total = mysqli_stmt_get_result($stmt_total);
-        $numtotal = mysqli_fetch_assoc($rs_total)['total'];
+        $numtotal = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_total))['total'];
         $totalpagina = ceil($numtotal / $quantidade);
 
         if ($totalpagina > 1):
         ?>
         <div class="card-footer bg-white d-flex justify-content-between align-items-center">
             <span class="text-muted">Total de Quartos: <?= $numtotal ?></span>
-            <nav aria-label="Navegação da página">
-                <ul class="pagination mb-0">
-                    <?php
-                    echo "<li class='page-item " . ($pagina == 1 ? 'disabled' : '') . "'><a class='page-link' href='?menuop=quartos&pagina=1'><i class='bi bi-chevron-bar-left'></i></a></li>";
-                    for ($i = 1; $i <= $totalpagina; $i++) {
-                        if ($i >= ($pagina - 2) && $i <= ($pagina + 2)) {
-                            echo "<li class='page-item " . ($i == $pagina ? 'active' : '') . "'><a class='page-link' href='?menuop=quartos&pagina=$i'>$i</a></li>";
-                        }
+            <nav><ul class="pagination mb-0">
+                <?php
+                echo "<li class='page-item " . ($pagina == 1 ? 'disabled' : '') . "'><a class='page-link' href='?menuop=quartos&pagina=1'><i class='bi bi-chevron-bar-left'></i></a></li>";
+                for ($i = 1; $i <= $totalpagina; $i++) {
+                    if ($i >= ($pagina - 2) && $i <= ($pagina + 2)) {
+                        echo "<li class='page-item " . ($i == $pagina ? 'active' : '') . "'><a class='page-link' href='?menuop=quartos&pagina=$i'>$i</a></li>";
                     }
-                    echo "<li class='page-item " . ($pagina == $totalpagina ? 'disabled' : '') . "'><a class='page-link' href='?menuop=quartos&pagina=$totalpagina'><i class='bi bi-chevron-bar-right'></i></a></li>";
-                    ?>
-                </ul>
-            </nav>
+                }
+                echo "<li class='page-item " . ($pagina == $totalpagina ? 'disabled' : '') . "'><a class='page-link' href='?menuop=quartos&pagina=$totalpagina'><i class='bi bi-chevron-bar-right'></i></a></li>";
+                ?>
+            </ul></nav>
         </div>
         <?php endif; ?>
     </div>
@@ -171,8 +167,37 @@ include_once("funcoes.php");
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () { /* ... seu JS de exclusão ... */ });
-<?php if (isset($_SESSION['message'])) { /* ... seu JS de notificação ... */ } ?>
+document.addEventListener('DOMContentLoaded', function () {
+    // Script de confirmação para exclusão
+    const deleteButtons = document.querySelectorAll('.btn-excluir');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault(); 
+            const deleteUrl = this.href;
+            Swal.fire({
+                title: 'Você tem certeza?', text: "Esta ação não poderá ser revertida!", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, excluir!', cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) { window.location.href = deleteUrl; }
+            });
+        });
+    });
+});
+
+// Script para exibir mensagens de pop-up
+<?php
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    ?>
+    Swal.fire({
+        icon: '<?= $message['type'] ?>', title: '<?= $message['text'] ?>',
+        showConfirmButton: false, timer: 2500
+    });
+    <?php
+    unset($_SESSION['message']);
+}
+?>
 </script>
 
 </body>

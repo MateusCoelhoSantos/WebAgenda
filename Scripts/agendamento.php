@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once("conexao.php"); 
 include_once("funcoes.php"); 
 
+// Detecta se o formulário foi enviado ou se é a carga inicial da página
 $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
 ?>
 <!DOCTYPE html>
@@ -35,47 +36,21 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
         <div class="card-header bg-white p-3">
             <form action="agenda.php?menuop=agendamento" method="post">
                 <div class="row g-3 align-items-end">
-                    <div class="col-12 col-lg-4">
-                        <label for="pesquisa" class="form-label fw-bold">Pesquisar</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input class="form-control" type="text" id="pesquisa" name="pesquisa" placeholder="Nome do cliente ou nº do quarto..." value="<?= htmlspecialchars($_POST['pesquisa'] ?? '') ?>">
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <label for="dataini" class="form-label fw-bold">De</label>
-                        <input class="form-control" type="date" name="dataini" id="dataini" value="<?= htmlspecialchars($_POST['dataini'] ?? '') ?>">
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <label for="datafin" class="form-label fw-bold">Até</label>
-                        <input class="form-control" type="date" name="datafin" id="datafin" value="<?= htmlspecialchars($_POST['datafin'] ?? '') ?>">
-                    </div>
-                    <div class="col-12 col-lg-2">
-                        <button class="btn btn-primary w-100" type="submit">Filtrar</button>
-                    </div>
+                    <div class="col-12 col-lg-4"><label for="pesquisa" class="form-label fw-bold">Pesquisar</label><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input class="form-control" type="text" id="pesquisa" name="pesquisa" placeholder="Nome do cliente ou nº do quarto..." value="<?= htmlspecialchars($_POST['pesquisa'] ?? '') ?>"></div></div>
+                    <div class="col-12 col-md-6 col-lg-3"><label for="dataini" class="form-label fw-bold">De</label><input class="form-control" type="date" name="dataini" id="dataini" value="<?= htmlspecialchars($_POST['dataini'] ?? '') ?>"></div>
+                    <div class="col-12 col-md-6 col-lg-3"><label for="datafin" class="form-label fw-bold">Até</label><input class="form-control" type="date" name="datafin" id="datafin" value="<?= htmlspecialchars($_POST['datafin'] ?? '') ?>"></div>
+                    <div class="col-12 col-lg-2"><button class="btn btn-primary w-100" type="submit">Filtrar</button></div>
                 </div>
                 <div class="row mt-3">
-                    <div class="col-12">
-                        <label class="form-label fw-bold">Status</label>
-                        <div class="d-flex">
-                            <?php $status_filtro = $_POST['status_filtro'] ?? '0'; ?>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status_filtro" id="status_ativos" value="0" <?php if ($status_filtro === '0') echo 'checked'; ?>>
-                                <label class="form-check-label" for="status_ativos">Ativos</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status_filtro" id="status_finalizados" value="1" <?php if ($status_filtro === '1') echo 'checked'; ?>>
-                                <label class="form-check-label" for="status_finalizados">Finalizados</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status_filtro" id="status_todos" value="all" <?php if ($status_filtro === 'all') echo 'checked'; ?>>
-                                <label class="form-check-label" for="status_todos">Todos</label>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="col-12"><label class="form-label fw-bold">Status</label><div class="d-flex">
+                        <?php $status_filtro = $_POST['status_filtro'] ?? '0'; ?>
+                        <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="status_filtro" id="status_ativos" value="0" <?php if ($status_filtro === '0') echo 'checked'; ?>><label class="form-check-label" for="status_ativos">Ativos</label></div>
+                        <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="status_filtro" id="status_finalizados" value="1" <?php if ($status_filtro === '1') echo 'checked'; ?>><label class="form-check-label" for="status_finalizados">Finalizados</label></div>
+                        <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="status_filtro" id="status_todos" value="all" <?php if ($status_filtro === 'all') echo 'checked'; ?>><label class="form-check-label" for="status_todos">Todos</label></div>
+                    </div></div>
                 </div>
             </form>
-            </div>
+        </div>
         <div class="card-header bg-white p-3 border-top text-end">
              <a href="agenda.php?menuop=cadastroagendamento" class="btn btn-success"><i class="bi bi-plus-lg"></i> Incluir Agendamento</a>
         </div>
@@ -94,62 +69,77 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                     </thead>
                     <tbody>
                         <?php
-                        // ... (TODO O SEU CÓDIGO PHP DE BUSCA E EXIBIÇÃO CONTINUA AQUI, SEM ALTERAÇÕES) ...
-                        // A LÓGICA PHP ESTÁ CORRETA, O PROBLEMA ERA APENAS O HTML DOS FILTROS.
                         $quantidade = 10;
                         $pagina = (isset($_GET['pagina'])) ? (int)$_GET['pagina'] : 1;
                         $inicio = ($quantidade * $pagina) - $quantidade;
-                        
-                        $base_sql = "SELECT 
-                                        r.*, 
-                                        p.nome, p.cpfcnpj, p.telefone, p.email, p.nasc, 
-                                        q.num_quarto, q.nome_quarto, q.capacidade_adultos, q.capacidade_criancas, q.preco_diaria, q.tem_wifi, q.tem_ar_condicionado, q.tem_tv
-                                    FROM reservas r 
-                                    INNER JOIN pessoas p ON r.id_pessoa = p.id_pessoa 
-                                    INNER JOIN quartos q ON r.id_quarto = q.id_quarto
-                                    WHERE r.excluido <> 1";
+
+                        $from_clause = "FROM reservas r 
+                                        INNER JOIN pessoas p ON r.id_pessoa = p.id_pessoa 
+                                        INNER JOIN quartos q ON r.id_quarto = q.id_quarto";
+                        $where_conditions = ["r.excluido <> 1"];
+                        $params = [];
+                        $types = '';
 
                         if ($is_post_request) {
                             $pesquisa = $_POST["pesquisa"] ?? ""; 
-                            $dataini = $_POST["dataini"] ?? date('Y-m-d');
-                            $datafin = $_POST["datafin"] ?? date('Y-m-d');
+                            $dataini = $_POST["dataini"] ?? '';
+                            $datafin = $_POST["datafin"] ?? '';
                             $status_filtro = $_POST['status_filtro'] ?? '0';
 
-                            $sql_status_condition = "";
-                            if ($status_filtro === '0') $sql_status_condition = "AND r.finalizado = 0";
-                            elseif ($status_filtro === '1') $sql_status_condition = "AND r.finalizado = 1";
-                            
-                            $sql = $base_sql . " AND (q.num_quarto LIKE ? OR p.nome LIKE ?) AND (r.horarioini BETWEEN ? AND ?) {$sql_status_condition} ORDER BY r.horarioini ASC LIMIT ?, ?";
-                            
-                            $stmt = mysqli_prepare($conexao, $sql);
-                            $termo_pesquisa = "%" . $pesquisa . "%";
-                            $datafim_filtro = $datafin . ' 23:59:59';
-                            mysqli_stmt_bind_param($stmt, 'ssssii', $pesquisa, $termo_pesquisa, $dataini, $datafim_filtro, $inicio, $quantidade);
+                            if (!empty($pesquisa)) {
+                                $where_conditions[] = "(q.num_quarto = ? OR p.nome LIKE ?)";
+                                $types .= 'ss';
+                                $params[] = $pesquisa;
+                                $params[] = "%" . $pesquisa . "%";
+                            }
+                            if (!empty($dataini) && !empty($datafin)) {
+                                $where_conditions[] = "(DATE(r.horarioini) BETWEEN ? AND ?)";
+                                $types .= 'ss';
+                                $params[] = $dataini;
+                                $params[] = $datafin;
+                            }
+                            if ($status_filtro !== 'all') {
+                                $where_conditions[] = "r.finalizado = ?";
+                                $types .= 'i';
+                                $params[] = $status_filtro;
+                            }
                         } else {
-                            $sql = $base_sql . " AND r.finalizado = 0 ORDER BY r.horarioini ASC LIMIT ?, ?";
-                            $stmt = mysqli_prepare($conexao, $sql);
-                            mysqli_stmt_bind_param($stmt, 'ii', $inicio, $quantidade);
+                            $where_conditions[] = "r.finalizado = 0";
                         }
 
-                        mysqli_stmt_execute($stmt);
-                        $RS = mysqli_stmt_get_result($stmt);
+                        $where_clause = "WHERE " . implode(" AND ", $where_conditions);
+
+                        $count_sql = "SELECT COUNT(r.id_reserva) as total " . $from_clause . " " . $where_clause;
+                        $stmt_total = mysqli_prepare($conexao, $count_sql);
+                        if (!empty($types)) {
+                            mysqli_stmt_bind_param($stmt_total, $types, ...$params);
+                        }
+                        mysqli_stmt_execute($stmt_total);
+                        $numtotal = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_total))['total'];
+                        $totalpagina = ceil($numtotal / $quantidade);
+
+                        $select_clause = "SELECT r.*, p.nome, p.cpfcnpj, p.telefone, p.email, p.nasc, 
+                                                 q.num_quarto, q.nome_quarto, q.preco_diaria, q.tem_wifi,q.capacidade_adultos,q.capacidade_criancas, q.tem_ar_condicionado, q.tem_tv,
+                                                 (SELECT qi.nome_arquivo FROM quarto_imagens qi WHERE qi.id_quarto = q.id_quarto LIMIT 1) as imagem_quarto";
+
+                        $sql_data = $select_clause . " " . $from_clause . " " . $where_clause . " ORDER BY r.horarioini ASC LIMIT ?, ?";
+                        $types_data = $types . 'ii';
+                        $params_data = array_merge($params, [$inicio, $quantidade]);
+
+                        $stmt_data = mysqli_prepare($conexao, $sql_data);
+                        if (!empty($types_data)) {
+                            mysqli_stmt_bind_param($stmt_data, $types_data, ...$params_data);
+                        }
+                        mysqli_stmt_execute($stmt_data);
+                        $RS = mysqli_stmt_get_result($stmt_data);
 
                         if (mysqli_num_rows($RS) > 0) {
                             foreach ($RS as $reserva) {
-                                $sql_img = "SELECT nome_arquivo FROM quarto_imagens WHERE id_quarto = ? LIMIT 1";
-                                $stmt_img = mysqli_prepare($conexao, $sql_img);
-                                mysqli_stmt_bind_param($stmt_img, 'i', $reserva['id_quarto']);
-                                mysqli_stmt_execute($stmt_img);
-                                $imagem_quarto = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_img))['nome_arquivo'] ?? null;
-                                
-                                $caminho_foto_quarto = "../Imagens/Quartos/" . ($imagem_quarto ?? 'quarto-sem-foto.png');
-                                if (empty($imagem_quarto) || !file_exists($caminho_foto_quarto)) {
+                                $caminho_foto_quarto = "../Imagens/Quartos/" . ($reserva['imagem_quarto'] ?? 'quarto-sem-foto.png');
+                                if (empty($reserva['imagem_quarto']) || !file_exists($caminho_foto_quarto)) {
                                     $caminho_foto_quarto = "../Imagens/Quartos/quarto-sem-foto.png";
                                 }
-
-                                $status_badge = $reserva['finalizado'] == 0 
-                                    ? "<span class='badge bg-success'>Ativo</span>" 
-                                    : "<span class='badge bg-secondary'>Finalizado</span>";
+                                $status_badge = $reserva['finalizado'] == 0 ? "<span class='badge bg-success'>Ativo</span>" : "<span class='badge bg-secondary'>Finalizado</span>";
                                 ?>
                                 <tr>
                                     <td class="ps-3"><?= htmlspecialchars($reserva['nome']) ?></td>
@@ -198,12 +188,65 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                 </table>
             </div>
         </div>
+        
+        <?php if (isset($totalpagina) && $totalpagina > 1): ?>
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+            <span class="text-muted">Total de Registros: <?= $numtotal ?></span>
+            <nav><ul class="pagination mb-0">
+                <li class="page-item <?= ($pagina == 1) ? 'disabled' : '' ?>"><a class="page-link" href="?menuop=agendamento&pagina=1">Primeira</a></li>
+                <?php
+                for ($i = 1; $i <= $totalpagina; $i++) {
+                    if ($i >= ($pagina - 2) && $i <= ($pagina + 2)) {
+                        echo "<li class='page-item " . ($i == $pagina ? 'active' : '') . "'><a class='page-link' href='?menuop=agendamento&pagina=$i'>$i</a></li>";
+                    }
+                }
+                ?>
+                <li class="page-item <?= ($pagina == $totalpagina) ? 'disabled' : '' ?>"><a class="page-link" href="?menuop=agendamento&pagina=<?= $totalpagina ?>">Última</a></li>
+            </ul></nav>
         </div>
+        <?php endif; ?>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Seus scripts de confirmação de exclusão e notificação
+document.addEventListener('DOMContentLoaded', function () {
+    const deleteButtons = document.querySelectorAll('.btn-excluir');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            const deleteUrl = this.href;
+            Swal.fire({
+                title: 'Você tem certeza?', text: "Esta ação não poderá ser revertida!", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, excluir!', cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) { window.location.href = deleteUrl; }
+            });
+        });
+    });
+
+    <?php if (!$is_post_request): ?>
+        const hojeFormatado = new Date().toISOString().slice(0, 10);
+        const dataIniInput = document.querySelector('[name="dataini"]');
+        const dataFinInput = document.querySelector('[name="datafin"]');
+        if (dataIniInput && !dataIniInput.value) { dataIniInput.value = hojeFormatado; }
+        if (dataFinInput && !dataFinInput.value) { dataFinInput.value = hojeFormatado; }
+    <?php endif; ?>
+});
+
+<?php
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    ?>
+    Swal.fire({
+        icon: '<?= $message['type'] ?>', title: '<?= $message['text'] ?>',
+        showConfirmButton: false, timer: 2500
+    });
+    <?php
+    unset($_SESSION['message']);
+}
+?>
 </script>
 
 </body>

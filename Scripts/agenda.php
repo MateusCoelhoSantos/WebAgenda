@@ -8,13 +8,13 @@ include_once("conexao.php");
 // --- INÍCIO DO BLOCO DE AUTENTICAÇÃO ---
 
 // Verifica se o formulário de login foi enviado
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usuario'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
     
-    $usuario = $_POST['usuario'];
+    $usuario = $_POST['email'];
     $senha_digitada = $_POST['senha'];
 
     // 1. ADICIONE 'foto_perfil' AQUI
-    $sql = "SELECT id_usuario, nome, senha, foto_perfil FROM usuarios WHERE (usuario = ? OR email = ?) AND excluido = 0";
+    $sql = "SELECT id_usuario, nome, senha, foto_perfil FROM usuarios WHERE (email = ? OR senha = ?) AND excluido = 0";
     $stmt = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($stmt, 'ss', $usuario, $usuario);
     mysqli_stmt_execute($stmt);
@@ -155,7 +155,16 @@ if (!isset($_SESSION['user_id'])) {
                     break; 
                 case 'perfil':
                     include("perfil.php");
-                    break;                   
+                    break; 
+                case 'login':
+                    include("login.php");
+                    break;       
+                case 'adicionar_imagem_quarto':
+                    include("adicionar_imagem_quarto.php");
+                    break; 
+                case 'remover_imagem_quarto':
+                    include("remover_imagem_quarto.php");
+                    break; 
                 default:
                 include("agendamento.php");
                     break;
