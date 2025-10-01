@@ -20,7 +20,8 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
     
     <style>
         .table td, .table th { vertical-align: middle; }
-        .details-img { width: 100%; height: 200px; object-fit: cover; border-radius: .375rem; }
+        /* ALTERAÇÃO AQUI: Altura da imagem ajustada para 360px */
+        .details-img { width: 100%; height: 360px; object-fit: cover; border-radius: .375rem; }
     </style>
 </head>
 <body style="background-color: #f0f2f5;">
@@ -157,14 +158,14 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                                         <div id="detalhes<?= $reserva['id_reserva'] ?>" class="collapse">
                                             <div class="p-3 bg-light">
                                                 <div class="row">
-                                                    <div class="col-md-5">
+                                                    <div class="col-md-6">
                                                         <h5><i class="bi bi-door-open"></i> Detalhes do Quarto</h5>
                                                         <img src="<?= $caminho_foto_quarto ?>" alt="Foto do Quarto" class="details-img img-thumbnail mb-2">
                                                         <p class="mb-1"><strong>Preço da Diária:</strong> R$ <?= number_format($reserva['preco_diaria'], 2, ',', '.') ?></p>
                                                         <p class="mb-1"><strong>Capacidade:</strong> <i class="bi bi-person-fill"></i> <?= $reserva['capacidade_adultos'] ?> <?php if($reserva['capacidade_criancas'] > 0) echo "+ <i class='bi bi-person'></i> " . $reserva['capacidade_criancas']; ?></p>
                                                         <p class="mb-0"><strong>Comodidades:</strong> <?php if($reserva['tem_wifi']) echo '<i class="bi bi-wifi" title="Wi-Fi"></i> '; ?><?php if($reserva['tem_ar_condicionado']) echo '<i class="bi bi-snow" title="Ar Condicionado"></i> '; ?><?php if($reserva['tem_tv']) echo '<i class="bi bi-tv" title="Televisão"></i> '; ?></p>
                                                     </div>
-                                                    <div class="col-md-7 border-start">
+                                                    <div class="col-md-6 border-start">
                                                         <h5><i class="bi bi-person-circle"></i> Detalhes do Cliente</h5>
                                                         <p class="mb-1"><strong>Nome:</strong> <?= htmlspecialchars($reserva['nome']) ?></p>
                                                         <p class="mb-1"><strong>CPF/CNPJ:</strong> <?= formatarCpfCnpj($reserva['cpfcnpj']) ?></p>
