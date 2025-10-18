@@ -83,32 +83,24 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Funções de Formatação ---
     function formatarCpfCnpjJS(numero) {
         const numeroLimpo = String(numero).replace(/\D/g, '');
-        if (numeroLimpo.length === 11) {
-            return numeroLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-        } else if (numeroLimpo.length === 14) {
-            return numeroLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-        }
+        if (numeroLimpo.length === 11) { return numeroLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'); } 
+        else if (numeroLimpo.length === 14) { return numeroLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5'); }
         return numero;
     }
 
     function formatarTelefoneJS(telefone) {
         const numeroLimpo = String(telefone).replace(/\D/g, '');
-        if (numeroLimpo.length === 11) {
-            return numeroLimpo.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1) $2 $3-$4');
-        } else if (numeroLimpo.length === 10) {
-            return numeroLimpo.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-        }
+        if (numeroLimpo.length === 11) { return numeroLimpo.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1) $2 $3-$4'); } 
+        else if (numeroLimpo.length === 10) { return numeroLimpo.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3'); }
         return telefone;
     }
 
-    // --- LÓGICA PARA DEFINIR A DATA E HORA LOCAL DO USUÁRIO ---
+    // --- LÓGICA DE DATA ---
     const inputHorarioIni = document.getElementById('horarioini');
     const inputHorarioFin = document.getElementById('horariofin');
-    
     const agora = new Date();
     agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
     inputHorarioIni.value = agora.toISOString().slice(0, 16);
-
     const amanha = new Date(agora);
     amanha.setDate(agora.getDate() + 1);
     inputHorarioFin.value = amanha.toISOString().slice(0, 16);
@@ -125,23 +117,29 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 listaClientes.innerHTML = "";
-                data.forEach(cliente => {
-                    const item = document.createElement("a");
-                    item.classList.add("list-group-item", "list-group-item-action");
-                    item.style.cursor = "pointer";
-                    item.textContent = `${cliente.nome} (${cliente.cpfcnpj})`;
-                    
-                    item.addEventListener("click", () => {
-                        nomeCliente.value = cliente.nome;
-                        document.getElementById("codcliente").value = cliente.id_pessoa;
-                        document.getElementById("cpfcnpj").innerText = formatarCpfCnpjJS(cliente.cpfcnpj);
-                        document.getElementById("telefone").innerText = formatarTelefoneJS(cliente.telefone);
-                        document.getElementById("email").innerText = cliente.email;
-                        infoCliente.classList.remove("d-none");
-                        listaClientes.innerHTML = "";
+                if (data.length === 0) {
+                    const noResultsItem = document.createElement("span");
+                    noResultsItem.classList.add("list-group-item", "text-muted");
+                    noResultsItem.textContent = "Nenhum cliente encontrado.";
+                    listaClientes.appendChild(noResultsItem);
+                } else {
+                    data.forEach(cliente => {
+                        const item = document.createElement("a");
+                        item.classList.add("list-group-item", "list-group-item-action");
+                        item.style.cursor = "pointer";
+                        item.textContent = `${cliente.nome} (${cliente.cpfcnpj})`;
+                        item.addEventListener("click", () => {
+                            nomeCliente.value = cliente.nome;
+                            document.getElementById("codcliente").value = cliente.id_pessoa;
+                            document.getElementById("cpfcnpj").innerText = formatarCpfCnpjJS(cliente.cpfcnpj);
+                            document.getElementById("telefone").innerText = formatarTelefoneJS(cliente.telefone);
+                            document.getElementById("email").innerText = cliente.email;
+                            infoCliente.classList.remove("d-none");
+                            listaClientes.innerHTML = "";
+                        });
+                        listaClientes.appendChild(item);
                     });
-                    listaClientes.appendChild(item);
-                });
+                }
             });
     });
 
@@ -162,42 +160,50 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 listaQuartos.innerHTML = "";
-                data.forEach(quarto => {
-                    const item = document.createElement("a");
-                    item.classList.add("list-group-item", "list-group-item-action");
-                    item.style.cursor = "pointer";
-                    item.textContent = `${quarto.num_quarto} - ${quarto.nome_quarto}`;
-                    
-                    item.addEventListener("click", () => {
-                        descQuarto.value = quarto.nome_quarto;
-                        numQuartoInput.value = quarto.id_quarto;
-                        numQuartoInput.dataset.precoDiaria = quarto.preco_diaria;
+                // --- MUDANÇA AQUI ---
+                if (data.length === 0) {
+                    const noResultsItem = document.createElement("span");
+                    noResultsItem.classList.add("list-group-item", "text-muted");
+                    noResultsItem.textContent = "Nenhum quarto disponível encontrado.";
+                    listaQuartos.appendChild(noResultsItem);
+                } else {
+                    data.forEach(quarto => {
+                        const item = document.createElement("a");
+                        item.classList.add("list-group-item", "list-group-item-action");
+                        item.style.cursor = "pointer";
+                        item.textContent = `${quarto.num_quarto} - ${quarto.nome_quarto}`;
                         
-                        const imgPath = quarto.imagens && quarto.imagens.length > 0 
-                            ? `../Imagens/Quartos/${quarto.imagens[0]}`
-                            : "../Imagens/Quartos/quarto-sem-foto.png";
-                        imagemQuartoEl.src = imgPath;
+                        item.addEventListener("click", () => {
+                            descQuarto.value = quarto.nome_quarto;
+                            numQuartoInput.value = quarto.id_quarto;
+                            numQuartoInput.dataset.precoDiaria = quarto.preco_diaria;
+                            
+                            const imgPath = quarto.imagens && quarto.imagens.length > 0 
+                                ? `../Imagens/Quartos/${quarto.imagens[0]}`
+                                : "../Imagens/Quartos/quarto-sem-foto.png";
+                            imagemQuartoEl.src = imgPath;
 
-                        precoDiariaSpan.innerText = parseFloat(quarto.preco_diaria).toFixed(2).replace('.', ',');
-                        
-                        let capacidadeHTML = `<i class="bi bi-person-fill"></i> ${quarto.capacidade_adultos}`;
-                        if (quarto.capacidade_criancas > 0) {
-                            capacidadeHTML += ` + <i class="bi bi-person" style="font-size: 0.8em;"></i> ${quarto.capacidade_criancas}`;
-                        }
-                        capacidadeQuartoEl.innerHTML = capacidadeHTML;
+                            precoDiariaSpan.innerText = parseFloat(quarto.preco_diaria).toFixed(2).replace('.', ',');
+                            
+                            let capacidadeHTML = `<i class="bi bi-person-fill"></i> ${quarto.capacidade_adultos}`;
+                            if (quarto.capacidade_criancas > 0) {
+                                capacidadeHTML += ` + <i class="bi bi-person" style="font-size: 0.8em;"></i> ${quarto.capacidade_criancas}`;
+                            }
+                            capacidadeQuartoEl.innerHTML = capacidadeHTML;
 
-                        let comodidadesHTML = '';
-                        if (quarto.tem_wifi) comodidadesHTML += `<i class="bi bi-wifi" title="Wi-Fi"></i> `;
-                        if (quarto.tem_ar_condicionado) comodidadesHTML += `<i class="bi bi-snow" title="Ar Condicionado"></i> `;
-                        if (quarto.tem_tv) comodidadesHTML += `<i class="bi bi-tv" title="Televisão"></i> `;
-                        comodidadesQuartoEl.innerHTML = comodidadesHTML.trim() ? comodidadesHTML : "Nenhuma";
-                        
-                        infoQuarto.classList.remove("d-none");
-                        listaQuartos.innerHTML = "";
-                        calcularValorTotal();
+                            let comodidadesHTML = '';
+                            if (quarto.tem_wifi) comodidadesHTML += `<i class="bi bi-wifi" title="Wi-Fi"></i> `;
+                            if (quarto.tem_ar_condicionado) comodidadesHTML += `<i class="bi bi-snow" title="Ar Condicionado"></i> `;
+                            if (quarto.tem_tv) comodidadesHTML += `<i class="bi bi-tv" title="Televisão"></i> `;
+                            comodidadesQuartoEl.innerHTML = comodidadesHTML.trim() ? comodidadesHTML : "Nenhuma";
+                            
+                            infoQuarto.classList.remove("d-none");
+                            listaQuartos.innerHTML = "";
+                            calcularValorTotal();
+                        });
+                        listaQuartos.appendChild(item);
                     });
-                    listaQuartos.appendChild(item);
-                });
+                }
             });
     });
 

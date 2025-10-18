@@ -1,4 +1,5 @@
 <?php
+// Garante que a sessão está ativa
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -20,16 +21,25 @@ try {
         throw new Exception("Todos os campos obrigatórios devem ser preenchidos.");
     }
     
-    // VERIFICAÇÃO DE CONFLITO: Checa se já não existe uma reserva para este quarto neste período
-    $sql_check = "SELECT id_reserva FROM reservas WHERE id_quarto = ? AND excluido = 0 AND NOT (horariofin <= ? OR horarioini >= ?)";
+    // --- VERIFICAÇÃO DE CONFLITO CORRIGIDA ---
+    // Agora, a consulta também verifica se a reserva conflitante NÃO está finalizada (finalizado = 0)
+    $sql_check = "SELECT id_reserva FROM reservas 
+                  WHERE id_quarto = ? 
+                  AND excluido = 0 
+                  AND finalizado = 0 -- <- CONDIÇÃO ADICIONADA AQUI
+                  AND ? < horariofin 
+                  AND ? > horarioini";
+                  
     $stmt_check = mysqli_prepare($conexao, $sql_check);
     mysqli_stmt_bind_param($stmt_check, 'iss', $id_quarto, $horarioini, $horariofin);
     mysqli_stmt_execute($stmt_check);
+    
     if (mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_check))) {
-        throw new Exception("Este quarto já está reservado para o período selecionado.");
+        // Se a consulta encontrar qualquer linha, significa que há um conflito com uma reserva ATIVA.
+        throw new Exception("Este quarto já possui uma reserva ativa para o período selecionado.");
     }
 
-    // 1. INSERE A RESERVA
+    // 1. INSERE A NOVA RESERVA
     $data_reserva = date('Y-m-d');
     $sql_insert = "INSERT INTO reservas (id_pessoa, tiporeserva, id_quarto, horarioini, horariofin, valor, quant_pessoas, obs, finalizado, excluido, data_reserva)
                    VALUES (?, 0, ?, ?, ?, ?, ?, ?, 0, 0, ?)"; 
@@ -39,7 +49,7 @@ try {
         throw new Exception("Não foi possível inserir a reserva.");
     }
 
-    // 2. ATUALIZA O STATUS DO QUARTO PARA INDISPONÍVEL
+    // 2. ATUALIZA O STATUS DO QUARTO PARA OCUPADO
     $sql_update = "UPDATE quartos SET status = 1 WHERE id_quarto = ?";
     $stmt_update = mysqli_prepare($conexao, $sql_update);
     mysqli_stmt_bind_param($stmt_update, 'i', $id_quarto);
