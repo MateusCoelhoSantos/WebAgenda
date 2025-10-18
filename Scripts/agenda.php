@@ -165,6 +165,9 @@ if (!isset($_SESSION['user_id'])) {
                 case 'remover_imagem_quarto':
                     include("remover_imagem_quarto.php");
                     break; 
+                case 'finalizaragendamento':
+                    include("finalizar_agendamento.php");
+                    break;
                 default:
                 include("agendamento.php");
                     break;

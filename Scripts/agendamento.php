@@ -20,7 +20,6 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
     
     <style>
         .table td, .table th { vertical-align: middle; }
-        /* ALTERAÇÃO AQUI: Altura da imagem ajustada para 360px */
         .details-img { width: 100%; height: 360px; object-fit: cover; border-radius: .375rem; }
     </style>
 </head>
@@ -74,47 +73,50 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                         $pagina = (isset($_GET['pagina'])) ? (int)$_GET['pagina'] : 1;
                         $inicio = ($quantidade * $pagina) - $quantidade;
 
+                        // --- LÓGICA DE FILTRO CORRIGIDA ---
                         $from_clause = "FROM reservas r 
                                         INNER JOIN pessoas p ON r.id_pessoa = p.id_pessoa 
                                         INNER JOIN quartos q ON r.id_quarto = q.id_quarto";
                         $where_conditions = ["r.excluido <> 1"];
                         $params = [];
                         $types = '';
+                        
+                        $pesquisa = $_POST["pesquisa"] ?? ""; 
+                        $status_filtro = $_POST['status_filtro'] ?? '0';
+                        $hoje = date('Y-m-d');
+                        
+                        // Define as datas: usa as do POST se existirem, senão usa a de hoje como padrão para a busca inicial
+                        $dataini = $is_post_request ? ($_POST["dataini"] ?? '') : $hoje;
+                        $datafin = $is_post_request ? ($_POST["datafin"] ?? '') : $hoje;
 
-                        if ($is_post_request) {
-                            $pesquisa = $_POST["pesquisa"] ?? ""; 
-                            $dataini = $_POST["dataini"] ?? '';
-                            $datafin = $_POST["datafin"] ?? '';
-                            $status_filtro = $_POST['status_filtro'] ?? '0';
+                        // Adiciona filtro de pesquisa por texto
+                        if (!empty($pesquisa)) {
+                            $where_conditions[] = "(q.num_quarto = ? OR p.nome LIKE ?)";
+                            $types .= 'ss';
+                            $params[] = $pesquisa;
+                            $params[] = "%" . $pesquisa . "%";
+                        }
 
-                            if (!empty($pesquisa)) {
-                                $where_conditions[] = "(q.num_quarto = ? OR p.nome LIKE ?)";
-                                $types .= 'ss';
-                                $params[] = $pesquisa;
-                                $params[] = "%" . $pesquisa . "%";
-                            }
-                            if (!empty($dataini) && !empty($datafin)) {
-                                $where_conditions[] = "(DATE(r.horarioini) BETWEEN ? AND ?)";
-                                $types .= 'ss';
-                                $params[] = $dataini;
-                                $params[] = $datafin;
-                            }
-                            if ($status_filtro !== 'all') {
-                                $where_conditions[] = "r.finalizado = ?";
-                                $types .= 'i';
-                                $params[] = $status_filtro;
-                            }
-                        } else {
-                            $where_conditions[] = "r.finalizado = 0";
+                        // Adiciona filtro de data APENAS se as datas estiverem preenchidas
+                        if (!empty($dataini) && !empty($datafin)) {
+                            $where_conditions[] = "(DATE(r.horarioini) BETWEEN ? AND ?)";
+                            $types .= 'ss';
+                            $params[] = $dataini;
+                            $params[] = $datafin;
+                        }
+
+                        // Adiciona filtro de status
+                        if ($status_filtro !== 'all') {
+                            $where_conditions[] = "r.finalizado = ?";
+                            $types .= 'i';
+                            $params[] = $status_filtro;
                         }
 
                         $where_clause = "WHERE " . implode(" AND ", $where_conditions);
 
                         $count_sql = "SELECT COUNT(r.id_reserva) as total " . $from_clause . " " . $where_clause;
                         $stmt_total = mysqli_prepare($conexao, $count_sql);
-                        if (!empty($types)) {
-                            mysqli_stmt_bind_param($stmt_total, $types, ...$params);
-                        }
+                        if (!empty($types)) { mysqli_stmt_bind_param($stmt_total, $types, ...$params); }
                         mysqli_stmt_execute($stmt_total);
                         $numtotal = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_total))['total'];
                         $totalpagina = ceil($numtotal / $quantidade);
@@ -122,15 +124,13 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                         $select_clause = "SELECT r.*, p.nome, p.cpfcnpj, p.telefone, p.email, p.nasc, 
                                                  q.num_quarto, q.nome_quarto, q.preco_diaria, q.tem_wifi,q.capacidade_adultos,q.capacidade_criancas, q.tem_ar_condicionado, q.tem_tv,
                                                  (SELECT qi.nome_arquivo FROM quarto_imagens qi WHERE qi.id_quarto = q.id_quarto LIMIT 1) as imagem_quarto";
-
+                        
                         $sql_data = $select_clause . " " . $from_clause . " " . $where_clause . " ORDER BY r.horarioini ASC LIMIT ?, ?";
                         $types_data = $types . 'ii';
                         $params_data = array_merge($params, [$inicio, $quantidade]);
 
                         $stmt_data = mysqli_prepare($conexao, $sql_data);
-                        if (!empty($types_data)) {
-                            mysqli_stmt_bind_param($stmt_data, $types_data, ...$params_data);
-                        }
+                        if (!empty($types_data)) { mysqli_stmt_bind_param($stmt_data, $types_data, ...$params_data); }
                         mysqli_stmt_execute($stmt_data);
                         $RS = mysqli_stmt_get_result($stmt_data);
 
@@ -149,6 +149,9 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                                     <td><?= $status_badge ?></td>
                                     <td class="text-end pe-3">
                                         <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#detalhes<?= $reserva['id_reserva'] ?>"><i class="bi bi-info-circle"></i> Detalhes</button>
+                                        <?php if ($reserva['finalizado'] == 0): ?>
+                                            <a href="agenda.php?menuop=finalizaragendamento&idreserva=<?= $reserva["id_reserva"] ?>" class="btn btn-outline-success btn-sm btn-finalizar" title="Finalizar Agendamento"><i class="bi bi-check-circle"></i></a>
+                                        <?php endif; ?>
                                         <a href="agenda.php?menuop=editaragendamento&idreserva=<?= $reserva["id_reserva"] ?>" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil-square"></i></a>
                                         <a href="agenda.php?menuop=excluiragendamento&idreserva=<?= $reserva["id_reserva"] ?>" class="btn btn-outline-danger btn-sm btn-excluir" title="Excluir"><i class="bi bi-trash3"></i></a>
                                     </td>
@@ -162,7 +165,7 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                                                         <h5><i class="bi bi-door-open"></i> Detalhes do Quarto</h5>
                                                         <img src="<?= $caminho_foto_quarto ?>" alt="Foto do Quarto" class="details-img img-thumbnail mb-2">
                                                         <p class="mb-1"><strong>Preço da Diária:</strong> R$ <?= number_format($reserva['preco_diaria'], 2, ',', '.') ?></p>
-                                                        <p class="mb-1"><strong>Capacidade:</strong> <i class="bi bi-person-fill"></i> <?= $reserva['capacidade_adultos'] ?> <?php if($reserva['capacidade_criancas'] > 0) echo "+ <i class='bi bi-person'></i> " . $reserva['capacidade_criancas']; ?></p>
+                                                        <p class="mb-1"><strong>Capacidade:</strong> <i class="bi bi-person-fill"></i> <?= $reserva['capacidade_adultos'] ?> <?php if($reserva['capacidade_criancas'] > 0) echo "+ <i class='bi bi-person' style='font-size:0.8em;'></i> " . $reserva['capacidade_criancas']; ?></p>
                                                         <p class="mb-0"><strong>Comodidades:</strong> <?php if($reserva['tem_wifi']) echo '<i class="bi bi-wifi" title="Wi-Fi"></i> '; ?><?php if($reserva['tem_ar_condicionado']) echo '<i class="bi bi-snow" title="Ar Condicionado"></i> '; ?><?php if($reserva['tem_tv']) echo '<i class="bi bi-tv" title="Televisão"></i> '; ?></p>
                                                     </div>
                                                     <div class="col-md-6 border-start">
@@ -181,7 +184,7 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                                 <?php
                             }
                         } else {
-                            $mensagem = $is_post_request ? "Nenhum agendamento encontrado para os filtros." : "Nenhum agendamento ativo encontrado.";
+                            $mensagem = $is_post_request ? "Nenhum agendamento encontrado para os filtros." : "Nenhum agendamento ativo encontrado para hoje.";
                             echo "<tr><td colspan='5' class='text-center p-4'>{$mensagem}</td></tr>";
                         }
                         ?>
@@ -209,6 +212,7 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -223,6 +227,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 confirmButtonText: 'Sim, excluir!', cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) { window.location.href = deleteUrl; }
+            });
+        });
+    });
+
+    const finalizeButtons = document.querySelectorAll('.btn-finalizar');
+    finalizeButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            const finalizeUrl = this.href;
+            Swal.fire({
+                title: 'Finalizar Agendamento?',
+                text: "Esta ação marcará o agendamento como concluído e liberará o quarto.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, finalizar!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = finalizeUrl;
+                }
             });
         });
     });
