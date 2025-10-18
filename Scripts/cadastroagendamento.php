@@ -2,7 +2,7 @@
 // Garante que a sessão está ativa
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // Protege a página (opcional, mas recomendado)
-// if (!isset($_SESSION['user_id'])) { header('Location: index.php?menuop=login'); exit(); }
+if (!isset($_SESSION['user_id'])) { header('Location: index.php?menuop=login'); exit(); }
 
 include_once("conexao.php"); 
 include_once("funcoes.php");
@@ -18,6 +18,7 @@ include_once("funcoes.php");
 <style>
     .list-group { max-height: 200px; overflow-y: auto; z-index: 1000; }
     .info-box { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin-top: 10px; margin-bottom: 1.5rem; border-radius: 8px; }
+    .info-box-img { width: 150px; height: 100px; object-fit: cover; border-radius: .375rem; }
 </style>
 </head>
 <body style="background-color: #f0f2f5;">
@@ -39,21 +40,36 @@ include_once("funcoes.php");
                             <div class="col-12 col-md-4"><label for="numquarto" class="form-label">ID Quarto</label><input type="text" class="form-control" id="numquarto" name="numquarto" readonly></div>
                             <div class="col-12 col-md-8 position-relative"><label for="descquarto" class="form-label">Quarto</label><input type="text" class="form-control" id="descquarto" name="descquarto" required autocomplete="off" placeholder="Digite para pesquisar..."><div id="listaQuartos" class="list-group position-absolute w-100"></div></div>
                         </div>
-                        <div id="infoQuarto" class="info-box d-none"><p class="mb-0"><strong>Preço da Diária:</strong> R$ <span id="preco_diaria"></span></p></div>
+                        
+                        <div id="infoQuarto" class="info-box d-none">
+                            <div class="row align-items-center">
+                                <div class="col-md-4 text-center">
+                                    <img src="../Imagens/Quartos/quarto-sem-foto.png" id="imagem_quarto" class="info-box-img img-thumbnail">
+                                </div>
+                                <div class="col-md-8 mt-3 mt-md-0">
+                                    <p class="mb-1"><strong>Diária:</strong> R$ <span id="preco_diaria">0,00</span></p>
+                                    <p class="mb-1"><strong>Capacidade:</strong> <span id="capacidade_quarto"></span></p>
+                                    <p class="mb-0"><strong>Comodidades:</strong> <span id="comodidades_quarto"></span></p>
+                                </div>
+                            </div>
+                        </div>
                         
                         <div class="row mb-3">
                             <div class="col-md-6"><label for="horarioini" class="form-label">Data/Hora Início</label><input type="datetime-local" class="form-control" name="horarioini" id="horarioini" required></div>
                             <div class="col-md-6"><label for="horariofin" class="form-label">Data/Hora Fim</label><input type="datetime-local" class="form-control" name="horariofin" id="horariofin" required></div>
                         </div>
-
                         <div class="row mb-3">
                             <div class="col-md-6"><label for="valor" class="form-label">Valor Total R$</label><input type="number" step="0.01" class="form-control" id="valor" name="valor" value="0.00" readonly></div>
                             <div class="col-md-6"><label for="quant_pessoas" class="form-label">Quantidade de Pessoas</label><input type="number" class="form-control" name="quant_pessoas" value="1"></div>
                         </div>
-                        
                         <div class="mb-3"><label for="obs" class="form-label">Observação</label><textarea class="form-control" id="obs" name="obs" rows="3" placeholder="Digite aqui alguma observação sobre a reserva..."></textarea></div>
 
-                        <div class="card-footer text-end bg-white"><a href="agenda.php?menuop=agendamento" class="btn btn-secondary">Cancelar</a><button type="submit" class="btn btn-success" name="incluir">Incluir Reserva</button></div>
+                        <div class="card-footer text-end bg-white px-0 pt-3">
+                            <a href="agenda.php?menuop=agendamento" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success" name="incluir">
+                                <i class="bi bi-check-circle"></i> Incluir Reserva
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -97,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
     amanha.setDate(agora.getDate() + 1);
     inputHorarioFin.value = amanha.toISOString().slice(0, 16);
 
-    // --- Autocomplete Clientes (CÓDIGO RESTAURADO) ---
+    // --- Autocomplete Clientes ---
     const nomeCliente = document.getElementById("nomecliente");
     const listaClientes = document.getElementById("listaClientes");
     const infoCliente = document.getElementById("infoCliente");
@@ -135,6 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const infoQuarto = document.getElementById("infoQuarto");
     const precoDiariaSpan = document.getElementById("preco_diaria");
     const numQuartoInput = document.getElementById("numquarto");
+    const imagemQuartoEl = document.getElementById("imagem_quarto");
+    const capacidadeQuartoEl = document.getElementById("capacidade_quarto");
+    const comodidadesQuartoEl = document.getElementById("comodidades_quarto");
 
     descQuarto.addEventListener("keyup", () => {
         const termo = descQuarto.value;
@@ -148,11 +167,31 @@ document.addEventListener("DOMContentLoaded", () => {
                     item.classList.add("list-group-item", "list-group-item-action");
                     item.style.cursor = "pointer";
                     item.textContent = `${quarto.num_quarto} - ${quarto.nome_quarto}`;
+                    
                     item.addEventListener("click", () => {
                         descQuarto.value = quarto.nome_quarto;
                         numQuartoInput.value = quarto.id_quarto;
                         numQuartoInput.dataset.precoDiaria = quarto.preco_diaria;
+                        
+                        const imgPath = quarto.imagens && quarto.imagens.length > 0 
+                            ? `../Imagens/Quartos/${quarto.imagens[0]}`
+                            : "../Imagens/Quartos/quarto-sem-foto.png";
+                        imagemQuartoEl.src = imgPath;
+
                         precoDiariaSpan.innerText = parseFloat(quarto.preco_diaria).toFixed(2).replace('.', ',');
+                        
+                        let capacidadeHTML = `<i class="bi bi-person-fill"></i> ${quarto.capacidade_adultos}`;
+                        if (quarto.capacidade_criancas > 0) {
+                            capacidadeHTML += ` + <i class="bi bi-person" style="font-size: 0.8em;"></i> ${quarto.capacidade_criancas}`;
+                        }
+                        capacidadeQuartoEl.innerHTML = capacidadeHTML;
+
+                        let comodidadesHTML = '';
+                        if (quarto.tem_wifi) comodidadesHTML += `<i class="bi bi-wifi" title="Wi-Fi"></i> `;
+                        if (quarto.tem_ar_condicionado) comodidadesHTML += `<i class="bi bi-snow" title="Ar Condicionado"></i> `;
+                        if (quarto.tem_tv) comodidadesHTML += `<i class="bi bi-tv" title="Televisão"></i> `;
+                        comodidadesQuartoEl.innerHTML = comodidadesHTML.trim() ? comodidadesHTML : "Nenhuma";
+                        
                         infoQuarto.classList.remove("d-none");
                         listaQuartos.innerHTML = "";
                         calcularValorTotal();
@@ -164,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- LÓGICA DE CÁLCULO DE VALOR TOTAL ---
     const valorInput = document.getElementById('valor');
-
     function calcularValorTotal() {
         const dataInicio = new Date(inputHorarioIni.value);
         const dataFim = new Date(inputHorarioFin.value);

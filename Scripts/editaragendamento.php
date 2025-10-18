@@ -8,7 +8,7 @@ include_once("funcoes.php");
 
 $idreserva = $_GET['idreserva'] ?? 0;
 
-// --- CONSULTA ATUALIZADA para buscar todos os detalhes do quarto e sua imagem principal ---
+// --- CONSULTA CORRIGIDA: Usa 'q.nome_quarto' e busca todos os detalhes ---
 $sql = "SELECT r.*, p.nome, p.cpfcnpj, p.telefone, p.email, 
                q.num_quarto, q.nome_quarto, q.preco_diaria, q.capacidade_adultos, q.capacidade_criancas, q.tem_wifi, q.tem_ar_condicionado, q.tem_tv,
                (SELECT qi.nome_arquivo FROM quarto_imagens qi WHERE qi.id_quarto = q.id_quarto LIMIT 1) as imagem_quarto
@@ -55,7 +55,9 @@ if (!$reserva) {
                         <div id="infoCliente" class="info-box"><p class="mb-1"><strong>CPF/CNPJ:</strong> <span id="cpfcnpj"><?= htmlspecialchars(formatarCpfCnpj($reserva['cpfcnpj'])) ?></span></p><p class="mb-1"><strong>Telefone:</strong> <span id="telefone"><?= htmlspecialchars(formatarTelefone($reserva['telefone'])) ?></span></p><p class="mb-0"><strong>Email:</strong> <span id="email"><?= htmlspecialchars($reserva['email']) ?></span></p></div>
 
                         <div class="row mb-3">
-                            <div class="col-12 col-md-4"><label for="numquarto" class="form-label">ID Quarto</label><input type="text" class="form-control" id="numquarto" name="numquarto" value="<?= htmlspecialchars($reserva['id_quarto']) ?>" data-preco-diaria="<?= htmlspecialchars($reserva['preco_diaria']) ?>" readonly></div>
+                            <div class="col-12 col-md-4"><label for="numquarto" class="form-label">ID Quarto</label>
+                                <input type="text" class="form-control" id="numquarto" name="numquarto" value="<?= htmlspecialchars($reserva['id_quarto']) ?>" data-preco-diaria="<?= htmlspecialchars($reserva['preco_diaria']) ?>" readonly>
+                            </div>
                             <div class="col-12 col-md-8 position-relative"><label for="descquarto" class="form-label">Quarto</label><input type="text" class="form-control" id="descquarto" name="descquarto" value="<?= htmlspecialchars($reserva['nome_quarto']) ?>" required autocomplete="off"><div id="listaQuartos" class="list-group position-absolute w-100"></div></div>
                         </div>
                         
@@ -99,7 +101,12 @@ if (!$reserva) {
                         </div>
                         <div class="mb-3"><label for="obs" class="form-label">Observação</label><textarea class="form-control" id="obs" name="obs" rows="3"><?= htmlspecialchars($reserva['obs'] ?? '') ?></textarea></div>
 
-                        <div class="card-footer text-end bg-white"><a href="agenda.php?menuop=agendamento" class="btn btn-secondary">Cancelar</a><button type="submit" class="btn btn-primary" name="alterar">Salvar Alterações</button></div>
+                        <div class="card-footer text-end bg-white px-0 pt-3">
+                            <a href="agenda.php?menuop=agendamento" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success" name="incluir">
+                                <i class="bi bi-check-circle"></i> Salvar Reserva
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -109,18 +116,67 @@ if (!$reserva) {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    // --- Funções e seletores ... ---
-    // ...
+    // --- Funções de Formatação ---
+    function formatarCpfCnpjJS(numero) {
+        const numeroLimpo = String(numero).replace(/\D/g, '');
+        if (numeroLimpo.length === 11) {
+            return numeroLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        } else if (numeroLimpo.length === 14) {
+            return numeroLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+        }
+        return numero;
+    }
 
-    // --- Autocomplete Clientes (sem alterações) ---
-    // ...
+    function formatarTelefoneJS(telefone) {
+        const numeroLimpo = String(telefone).replace(/\D/g, '');
+        if (numeroLimpo.length === 11) {
+            return numeroLimpo.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1) $2 $3-$4');
+        } else if (numeroLimpo.length === 10) {
+            return numeroLimpo.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+        }
+        return telefone;
+    }
 
-    // --- Autocomplete Quartos (COM GRANDES ALTERAÇÕES) ---
+    // --- Seletores dos elementos principais ---
+    const inputHorarioIni = document.getElementById('horarioini');
+    const inputHorarioFin = document.getElementById('horariofin');
+    const numQuartoInput = document.getElementById("numquarto");
+    const valorInput = document.getElementById('valor');
+
+    // --- Autocomplete Clientes ---
+    const nomeCliente = document.getElementById("nomecliente");
+    const listaClientes = document.getElementById("listaClientes");
+    nomeCliente.addEventListener("keyup", () => {
+        const termo = nomeCliente.value;
+        if (termo.length < 2) { listaClientes.innerHTML = ""; return; }
+        fetch("buscaCliente.php?termo=" + termo)
+            .then(res => res.json())
+            .then(data => {
+                listaClientes.innerHTML = "";
+                data.forEach(cliente => {
+                    const item = document.createElement("a");
+                    item.classList.add("list-group-item", "list-group-item-action");
+                    item.textContent = `${cliente.nome} (${cliente.cpfcnpj})`;
+                    item.style.cursor = "pointer";
+                    item.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        nomeCliente.value = cliente.nome;
+                        document.getElementById("codcliente").value = cliente.id_pessoa;
+                        document.getElementById("cpfcnpj").innerText = formatarCpfCnpjJS(cliente.cpfcnpj);
+                        document.getElementById("telefone").innerText = formatarTelefoneJS(cliente.telefone);
+                        document.getElementById("email").innerText = cliente.email;
+                        listaClientes.innerHTML = "";
+                    });
+                    listaClientes.appendChild(item);
+                });
+            });
+    });
+
+    // --- Autocomplete Quartos ---
     const descQuarto = document.getElementById("descquarto");
     const listaQuartos = document.getElementById("listaQuartos");
     const infoQuarto = document.getElementById("infoQuarto");
     const precoDiariaSpan = document.getElementById("preco_diaria");
-    const numQuartoInput = document.getElementById("numquarto");
     const imagemQuartoEl = document.getElementById("imagem_quarto");
     const capacidadeQuartoEl = document.getElementById("capacidade_quarto");
     const comodidadesQuartoEl = document.getElementById("comodidades_quarto");
@@ -140,34 +196,28 @@ document.addEventListener("DOMContentLoaded", () => {
                     item.addEventListener("click", (e) => {
                         e.preventDefault();
                         
-                        // Preenche os campos do formulário
                         descQuarto.value = quarto.nome_quarto;
                         numQuartoInput.value = quarto.id_quarto;
                         numQuartoInput.dataset.precoDiaria = quarto.preco_diaria;
                         
-                        // --- NOVO: Atualiza o info-box do quarto ---
-                        // Imagem
-                        const imgPath = quarto.imagens.length > 0 
+                        const imgPath = quarto.imagens && quarto.imagens.length > 0 
                             ? `../Imagens/Quartos/${quarto.imagens[0]}`
                             : "../Imagens/Quartos/quarto-sem-foto.png";
                         imagemQuartoEl.src = imgPath;
 
-                        // Preço
                         precoDiariaSpan.innerText = parseFloat(quarto.preco_diaria).toFixed(2).replace('.', ',');
                         
-                        // Capacidade
                         let capacidadeHTML = `<i class="bi bi-person-fill"></i> ${quarto.capacidade_adultos}`;
                         if (quarto.capacidade_criancas > 0) {
                             capacidadeHTML += ` + <i class="bi bi-person" style="font-size: 0.8em;"></i> ${quarto.capacidade_criancas}`;
                         }
                         capacidadeQuartoEl.innerHTML = capacidadeHTML;
 
-                        // Comodidades
                         let comodidadesHTML = '';
                         if (quarto.tem_wifi) comodidadesHTML += `<i class="bi bi-wifi" title="Wi-Fi"></i> `;
                         if (quarto.tem_ar_condicionado) comodidadesHTML += `<i class="bi bi-snow" title="Ar Condicionado"></i> `;
                         if (quarto.tem_tv) comodidadesHTML += `<i class="bi bi-tv" title="Televisão"></i> `;
-                        comodidadesQuartoEl.innerHTML = comodidadesHTML;
+                        comodidadesQuartoEl.innerHTML = comodidadesHTML.trim() ? comodidadesHTML : "Nenhuma";
                         
                         infoQuarto.classList.remove("d-none");
                         listaQuartos.innerHTML = "";
@@ -178,9 +228,28 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 
-    // --- LÓGICA DE CÁLCULO DE VALOR TOTAL (sem alterações) ---
-    // ...
+    // --- LÓGICA DE CÁLCULO DE VALOR TOTAL ---
+    function calcularValorTotal() {
+        const dataInicio = new Date(inputHorarioIni.value);
+        const dataFim = new Date(inputHorarioFin.value);
+        const precoDiaria = parseFloat(numQuartoInput.dataset.precoDiaria);
 
+        if (!isNaN(dataInicio) && !isNaN(dataFim) && !isNaN(precoDiaria) && dataFim > dataInicio) {
+            const diffMilissegundos = dataFim - dataInicio;
+            const diffDias = diffMilissegundos / (1000 * 60 * 60 * 24);
+            const numeroDeNoites = Math.ceil(diffDias);
+            const valorTotal = numeroDeNoites * precoDiaria;
+            valorInput.value = valorTotal.toFixed(2);
+        } else {
+            valorInput.value = "0.00";
+        }
+    }
+
+    // Adiciona os gatilhos para recalcular
+    inputHorarioIni.addEventListener('change', calcularValorTotal);
+    inputHorarioFin.addEventListener('change', calcularValorTotal);
+    
+    // Roda o cálculo uma vez no carregamento da página
     calcularValorTotal();
 });
 </script>
