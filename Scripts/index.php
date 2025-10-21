@@ -68,6 +68,9 @@ include_once("conexao.php");
             case 'cadastro':
                 include("cadusu.php");
                 break;
+            case 'insereusuario':
+                include("insereusuario.php");
+                break;
             default:
                 include("home.php");
                 break;
