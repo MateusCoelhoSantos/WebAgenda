@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Servidor:                     127.0.0.1
--- Versão do servidor:           8.4.3 - MySQL Community Server - GPL
+-- Versão do servidor:           8.0.30 - MySQL Community Server - GPL
 -- OS do Servidor:               Win64
--- HeidiSQL Versão:              12.8.0.6908
+-- HeidiSQL Versão:              12.1.0.6537
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,7 +20,6 @@ CREATE DATABASE IF NOT EXISTS `webagenda` /*!40100 DEFAULT CHARACTER SET utf8mb4
 USE `webagenda`;
 
 -- Copiando estrutura para tabela webagenda.contato
-DROP TABLE IF EXISTS `contato`;
 CREATE TABLE IF NOT EXISTS `contato` (
   `id_contato` int NOT NULL AUTO_INCREMENT,
   `id_pessoa` int DEFAULT NULL,
@@ -33,29 +32,29 @@ CREATE TABLE IF NOT EXISTS `contato` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.contato: ~0 rows (aproximadamente)
-DELETE FROM `contato`;
 
 -- Copiando estrutura para tabela webagenda.endereco
-DROP TABLE IF EXISTS `endereco`;
 CREATE TABLE IF NOT EXISTS `endereco` (
   `id_endereco` int unsigned NOT NULL AUTO_INCREMENT,
   `id_pessoa` int DEFAULT NULL,
-  `rua` varchar(100) DEFAULT NULL,
+  `rua` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `numero` varchar(50) DEFAULT NULL,
   `bairro` varchar(50) DEFAULT NULL,
   `cidade` varchar(50) DEFAULT NULL,
-  `uf` char(50) DEFAULT NULL,
+  `uf` char(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `cep` varchar(50) DEFAULT NULL,
+  `complemento` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`id_endereco`),
   KEY `FK__endereco_pessoa` (`id_pessoa`),
   CONSTRAINT `FK__endereco_pessoa` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoas` (`id_pessoa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.endereco: ~0 rows (aproximadamente)
-DELETE FROM `endereco`;
+-- Copiando dados para a tabela webagenda.endereco: ~2 rows (aproximadamente)
+REPLACE INTO `endereco` (`id_endereco`, `id_pessoa`, `rua`, `numero`, `bairro`, `cidade`, `uf`, `cep`, `complemento`) VALUES
+	(1, 70, 'rua dos migrantes alvares', '256', 'orquideas', 'Florianópolis', 'SC', '88010040', 'casas de madeira'),
+	(2, 71, 'Rua Quinze de Novembro', '258', 'Campinas', 'São José', 'SC', '88101440', 'casas de madeira');
 
 -- Copiando estrutura para tabela webagenda.estoque
-DROP TABLE IF EXISTS `estoque`;
 CREATE TABLE IF NOT EXISTS `estoque` (
   `id_produto` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) DEFAULT NULL,
@@ -73,10 +72,8 @@ CREATE TABLE IF NOT EXISTS `estoque` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.estoque: ~0 rows (aproximadamente)
-DELETE FROM `estoque`;
 
 -- Copiando estrutura para tabela webagenda.grupo
-DROP TABLE IF EXISTS `grupo`;
 CREATE TABLE IF NOT EXISTS `grupo` (
   `id_grupo` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) DEFAULT NULL,
@@ -84,10 +81,8 @@ CREATE TABLE IF NOT EXISTS `grupo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.grupo: ~0 rows (aproximadamente)
-DELETE FROM `grupo`;
 
 -- Copiando estrutura para tabela webagenda.itensvenda
-DROP TABLE IF EXISTS `itensvenda`;
 CREATE TABLE IF NOT EXISTS `itensvenda` (
   `id_item` int NOT NULL AUTO_INCREMENT,
   `id_venda` int DEFAULT NULL,
@@ -101,10 +96,8 @@ CREATE TABLE IF NOT EXISTS `itensvenda` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.itensvenda: ~0 rows (aproximadamente)
-DELETE FROM `itensvenda`;
 
 -- Copiando estrutura para tabela webagenda.marca
-DROP TABLE IF EXISTS `marca`;
 CREATE TABLE IF NOT EXISTS `marca` (
   `id_marca` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) DEFAULT NULL,
@@ -112,10 +105,8 @@ CREATE TABLE IF NOT EXISTS `marca` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.marca: ~0 rows (aproximadamente)
-DELETE FROM `marca`;
 
 -- Copiando estrutura para tabela webagenda.pessoas
-DROP TABLE IF EXISTS `pessoas`;
 CREATE TABLE IF NOT EXISTS `pessoas` (
   `id_pessoa` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -129,11 +120,10 @@ CREATE TABLE IF NOT EXISTS `pessoas` (
   `genero` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'M-Masculino, F-Feminino, N-Não Identificado',
   `excluido` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id_pessoa`)
-) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.pessoas: ~63 rows (aproximadamente)
-DELETE FROM `pessoas`;
-INSERT INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `genero`, `excluido`) VALUES
+-- Copiando dados para a tabela webagenda.pessoas: ~66 rows (aproximadamente)
+REPLACE INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `tipopessoa`, `email`, `telefone`, `genero`, `excluido`) VALUES
 	(1, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'F', 0),
 	(2, 'Mateus Santos', '02878024265', '0001', '2007-09-13', 0, 1, 'Mateus@gmail.com', '69992235346', 'M', 1),
 	(4, 'Mateus Coelho', '02878024265', '0001', '2003-09-13', 0, 1, 'mateus@hotmail.com', '69992134628', 'M', 0),
@@ -143,7 +133,7 @@ INSERT INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `t
 	(9, 'jose olivas', '567765', '43232', '2024-03-05', 0, 1, 'teste', 'teste', 'N', 1),
 	(10, 'paulinho pereira', '1233254', '123657', '2023-09-06', 0, 1, 'pereira@paulinho.com', 'treqwe', 'M', 0),
 	(11, 'atestado', '00.099.876/5431-23', 'eutanasia', '2024-02-16', 1, 1, 'jovem@outlook.com', '', 'N', 0),
-	(12, 'abraco', '00.099.876/5431-23', '123345', '2024-01-24', 1, 1, 'jovem@gmail.com', '(69) 9 9223-5646', 'F', 0),
+	(12, 'abraco', '00.099.876/5431-23', '123345', '2024-01-24', 1, 1, 'jovem@gmail.com', '(69) 9 9223-5646', 'N', 0),
 	(13, 'amanda amorim', '1234', '1234', '2004-02-13', 1, 1, 'atualizado@atual.com', '431123', 'F', 1),
 	(14, 'jose olivas', '567765', '123657', '2024-05-26', 1, 1, 'jovem@outlook.com', '431123', 'M', 0),
 	(15, 'amanda amorim', '1234', '43232', '2024-04-03', 1, 1, 'atualizado@atual.com', '1231231213', 'F', 0),
@@ -197,10 +187,11 @@ INSERT INTO `pessoas` (`id_pessoa`, `nome`, `cpfcnpj`, `rgie`, `nasc`, `f_j`, `t
 	(66, 'marcos antonio', '01236547895', '01236654', '2025-07-01', 0, 1, 'teste@hotmail.com', '123123', 'M', 0),
 	(67, 'teste', 'trdyr', '123123', '2003-09-13', 0, 1, 'tesdte', '123321', 'M', 0),
 	(68, 'Amarindo ferreira', '012.345.678-98', '0123546', '1996-06-13', 0, 1, 'amarindo@gmail.com', '(69) 9 9213-4628', 'F', 0),
-	(69, 'Aparecida Barbosa', '12365478965', '12365', '2001-06-07', 0, 1, 'teste333@gmail.com', '69992134628', 'N', 0);
+	(69, 'Aparecida Barbosa', '12365478965', '12365', '2001-06-07', 0, 1, 'teste333@gmail.com', '69992134628', 'N', 0),
+	(70, 'abadabe abadoo', '29582806249', '0123456', '2025-10-01', 0, 1, 'jovem@gmail.com', '69992235346', 'M', 0),
+	(71, 'abraco', '29582806249', '0123456', '2025-10-02', 0, 1, 'jovem@gmail.com', '', 'M', 0);
 
 -- Copiando estrutura para tabela webagenda.quartos
-DROP TABLE IF EXISTS `quartos`;
 CREATE TABLE IF NOT EXISTS `quartos` (
   `id_quarto` int NOT NULL AUTO_INCREMENT,
   `num_quarto` int DEFAULT NULL,
@@ -219,24 +210,22 @@ CREATE TABLE IF NOT EXISTS `quartos` (
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.quartos: ~13 rows (aproximadamente)
-DELETE FROM `quartos`;
-INSERT INTO `quartos` (`id_quarto`, `num_quarto`, `nome_quarto`, `descricao`, `capacidade_adultos`, `capacidade_criancas`, `preco_diaria`, `tem_wifi`, `tem_ar_condicionado`, `tem_tv`, `status`, `excluido`) VALUES
+REPLACE INTO `quartos` (`id_quarto`, `num_quarto`, `nome_quarto`, `descricao`, `capacidade_adultos`, `capacidade_criancas`, `preco_diaria`, `tem_wifi`, `tem_ar_condicionado`, `tem_tv`, `status`, `excluido`) VALUES
 	(1, 1, '', 'Suíte de Luxo', 2, 0, 0.00, 1, 1, 1, 0, 1),
-	(2, 2, '', 'suite', 2, 0, 0.00, 1, 1, 1, 0, 0),
-	(3, 3, '', '1 cama solteiro', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(2, 2, 'quarto solteiro', 'suites', 1, 0, 160.00, 1, 1, 1, 1, 0),
+	(3, 3, 'quarto triplo', '1 cama solteiro', 3, 0, 160.00, 1, 1, 0, 1, 0),
 	(5, 33333, '', 'teste12312', 2, 0, 0.00, 1, 1, 1, 0, 1),
 	(6, 123, '', 'tste', 2, 0, 0.00, 1, 1, 1, 0, 1),
-	(7, 4568, '', 'suite de premium plus', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(7, 4568, '', 'suite de premium plus', 2, 0, 0.00, 1, 1, 1, 0, 1),
 	(8, 4123, '', 'testeste', 2, 0, 0.00, 1, 1, 1, 0, 1),
 	(9, 9663, '', 'ertwsef', 2, 0, 0.00, 1, 1, 1, 0, 1),
-	(10, 1452, '', 'o melhor quarto da casa', 2, 0, 0.00, 1, 1, 1, 0, 0),
+	(10, 1452, 'o melhor quarto da casa', 'o melhor quarto da casa', 2, 0, 50.00, 1, 1, 1, 1, 0),
 	(11, 44, '', 'sdfsd', 2, 0, 0.00, 1, 1, 1, 0, 1),
-	(12, 7676, '', 'ertert', 2, 0, 0.00, 1, 1, 1, 0, 0),
-	(13, 6262, '', 'um quarto qualquer', 2, 0, 0.00, 1, 1, 1, 0, 0),
-	(14, 512, 'Quarto casal', '', 2, 0, 250.00, 1, 1, 1, 0, 0);
+	(12, 7676, '', 'ertert', 2, 0, 0.00, 1, 1, 1, 0, 1),
+	(13, 6262, '', 'um quarto qualquer', 2, 0, 0.00, 1, 1, 1, 0, 1),
+	(14, 512, 'Quarto casal', '', 2, 0, 250.00, 1, 0, 0, 0, 0);
 
 -- Copiando estrutura para tabela webagenda.quarto_imagens
-DROP TABLE IF EXISTS `quarto_imagens`;
 CREATE TABLE IF NOT EXISTS `quarto_imagens` (
   `id_imagem` int NOT NULL AUTO_INCREMENT,
   `id_quarto` int NOT NULL,
@@ -244,17 +233,16 @@ CREATE TABLE IF NOT EXISTS `quarto_imagens` (
   PRIMARY KEY (`id_imagem`),
   KEY `id_quarto` (`id_quarto`),
   CONSTRAINT `quarto_imagens_ibfk_1` FOREIGN KEY (`id_quarto`) REFERENCES `quartos` (`id_quarto`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.quarto_imagens: ~0 rows (aproximadamente)
-DELETE FROM `quarto_imagens`;
-INSERT INTO `quarto_imagens` (`id_imagem`, `id_quarto`, `nome_arquivo`) VALUES
-	(1, 14, '68cc75f465bba_1758230004.jpg'),
-	(2, 14, '68cc75f466286_1758230004.jpg'),
-	(3, 14, '68cc75f46678b_1758230004.png');
+-- Copiando dados para a tabela webagenda.quarto_imagens: ~4 rows (aproximadamente)
+REPLACE INTO `quarto_imagens` (`id_imagem`, `id_quarto`, `nome_arquivo`) VALUES
+	(11, 14, '68dc74a933c63_1759278249.png'),
+	(12, 10, '68dc74c9b2ccf_1759278281.png'),
+	(13, 3, '68dc74d863ac0_1759278296.png'),
+	(14, 2, '68dc74e928299_1759278313.png');
 
 -- Copiando estrutura para tabela webagenda.reservas
-DROP TABLE IF EXISTS `reservas`;
 CREATE TABLE IF NOT EXISTS `reservas` (
   `id_reserva` int NOT NULL AUTO_INCREMENT,
   `id_pessoa` int NOT NULL DEFAULT '0',
@@ -273,19 +261,23 @@ CREATE TABLE IF NOT EXISTS `reservas` (
   KEY `FK_quarto` (`id_quarto`) USING BTREE,
   CONSTRAINT `FK__pessoas` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoas` (`id_pessoa`),
   CONSTRAINT `FK_quarto` FOREIGN KEY (`id_quarto`) REFERENCES `quartos` (`id_quarto`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.reservas: ~5 rows (aproximadamente)
-DELETE FROM `reservas`;
-INSERT INTO `reservas` (`id_reserva`, `id_pessoa`, `tiporeserva`, `obs`, `horarioini`, `horariofin`, `quant_pessoas`, `valor`, `finalizado`, `excluido`, `data_reserva`, `id_quarto`) VALUES
-	(5, 1, 0, '0', '2025-09-15 03:35:00', '2025-10-15 03:35:00', 0, 150, 0, 0, '2025-08-20', 1),
+-- Copiando dados para a tabela webagenda.reservas: ~11 rows (aproximadamente)
+REPLACE INTO `reservas` (`id_reserva`, `id_pessoa`, `tiporeserva`, `obs`, `horarioini`, `horariofin`, `quant_pessoas`, `valor`, `finalizado`, `excluido`, `data_reserva`, `id_quarto`) VALUES
+	(5, 1, 0, 'kkkkkk', '2025-09-15 03:35:00', '2025-10-15 03:35:00', 1, 4800, 0, 1, '2025-08-20', 2),
 	(8, 1, 0, '0', '2025-09-15 03:18:00', '2025-09-15 03:18:00', 2, 500, 0, 1, '2025-09-14', 1),
-	(9, 1, 0, 'tudo normal por aqui. só que não', '2025-09-15 02:46:00', '2025-09-15 02:46:00', 1, 500, 0, 0, '2025-09-14', 2),
+	(9, 1, 0, 'tudo normal por aqui. só que não', '2025-09-15 02:46:00', '2025-09-15 02:46:00', 1, 500, 0, 1, '2025-09-14', 2),
 	(10, 15, 0, 'vai chegar depois do horario de check-in', '2025-09-15 05:02:00', '2025-10-15 05:02:00', 1, 500, 0, 1, '2025-09-15', 7),
-	(11, 4, 0, '', '2025-09-15 05:07:00', '2025-09-20 05:07:00', 2, 200, 0, 0, '2025-09-15', 5);
+	(11, 4, 0, '', '2025-09-15 05:07:00', '2025-09-20 05:07:00', 2, 200, 0, 1, '2025-09-15', 5),
+	(12, 1, 0, '', '2025-09-30 00:57:00', '2025-10-03 00:57:00', 1, 500, 1, 0, '2025-09-20', 14),
+	(13, 1, 0, '', '2025-09-20 20:24:00', '2025-09-24 20:24:00', 5, 640, 1, 0, '2025-09-20', 3),
+	(14, 66, 0, '', '2025-10-01 00:13:00', '2025-10-10 00:13:00', 1, 1440, 0, 0, '2025-10-01', 2),
+	(15, 1, 0, '', '2025-10-18 18:57:00', '2025-10-21 18:57:00', 1, 150, 1, 0, '2025-10-18', 10),
+	(16, 1, 0, 'teste', '2025-10-18 20:20:00', '2025-10-21 20:20:00', 1, 480, 0, 0, '2025-10-18', 3),
+	(17, 20, 0, 'testeeeeeeee', '2025-10-18 21:03:00', '2025-10-30 21:03:00', 1, 600, 0, 0, '2025-10-18', 10);
 
 -- Copiando estrutura para tabela webagenda.usuarios
-DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id_usuario` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) DEFAULT NULL,
@@ -299,16 +291,15 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `foto_perfil` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Copiando dados para a tabela webagenda.usuarios: ~2 rows (aproximadamente)
-DELETE FROM `usuarios`;
-INSERT INTO `usuarios` (`id_usuario`, `nome`, `email`, `senha`, `telefone`, `reset_token`, `token_expira_em`, `excluido`, `cpf`, `foto_perfil`) VALUES
-	(6, 'Mateus Coelho', 'mateuscoelhosoporo@gmail.com', '$2y$10$ySPcrKBLU0.NtOnF19B97eeVuPr41BSC0J.ztu0.oupzVkr719kRO', '69992134628', NULL, NULL, 0, '02878024265', '68cc70f71ff4d_1758228727.jpg'),
-	(7, 'Mateus Coelho Santos', 'mateuscoelhosoporo@hotmail.com', '$2y$10$12RcMTKuiA6VBiqzfqy1q.XnNeCqHYEWrom/5vTXVr5DSvNes4UVe', '69992134628', NULL, NULL, 0, '02878024265', NULL);
+-- Copiando dados para a tabela webagenda.usuarios: ~3 rows (aproximadamente)
+REPLACE INTO `usuarios` (`id_usuario`, `nome`, `email`, `senha`, `telefone`, `reset_token`, `token_expira_em`, `excluido`, `cpf`, `foto_perfil`) VALUES
+	(6, 'Mateus Coelho', 'mateuscoelhosoporo@gmail.com', '$2y$10$fIbB/NEywm5UD1DFNgrbUOCltp/rKvszwHJpDsSHtlziLljQXnn22', '69992134628', NULL, NULL, 0, '02878024265', '68cc70f71ff4d_1758228727.jpg'),
+	(7, 'Mateus Coelho Santos', 'mateuscoelhosoporo@hotmail.com', '$2y$10$12RcMTKuiA6VBiqzfqy1q.XnNeCqHYEWrom/5vTXVr5DSvNes4UVe', '(69) 9 9213-4628', NULL, NULL, 0, '02878024265', NULL),
+	(8, 'Mateus Coelho Santos', 'mateussantos@portalevolucao.com', '$2y$10$Pe6leVFLUwBe2LmWwfaxnupPJfE89goEnAC4U5uZOB.epLoZqAd3m', '(69) 99223-5346', NULL, NULL, 0, '02878024265', NULL);
 
 -- Copiando estrutura para tabela webagenda.venda
-DROP TABLE IF EXISTS `venda`;
 CREATE TABLE IF NOT EXISTS `venda` (
   `id_venda` int NOT NULL AUTO_INCREMENT,
   `id_cliente` int DEFAULT NULL,
@@ -323,7 +314,6 @@ CREATE TABLE IF NOT EXISTS `venda` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Copiando dados para a tabela webagenda.venda: ~0 rows (aproximadamente)
-DELETE FROM `venda`;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -43,6 +43,8 @@ if (!function_exists('validarCpf')) {
     }
 }
 
+// Inicializa a variável de redirecionamento padrão (para erros)
+$redirect_url = 'index.php?menuop=cadastro'; 
 
 // Bloco try-catch para um tratamento de erros mais robusto
 try {
@@ -71,6 +73,9 @@ try {
         throw new Exception("A senha deve ter no mínimo 6 caracteres.");
     }
 
+    // Limpa o CPF para salvar apenas números
+    $cpf_limpo = preg_replace('/[^0-9]/is', '', $cpf);
+
     // 3. CRIPTOGRAFA A SENHA
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
@@ -83,12 +88,12 @@ try {
         throw new Exception("Erro ao preparar a consulta: ".mysqli_error($conexao));
     }
     
-    // 5. Associa os parâmetros
+    // 5. Associa os parâmetros (usando o CPF limpo)
     mysqli_stmt_bind_param($stmt, 'sssss',
         $nome,
         $email,
         $telefone,
-        $cpf,
+        $cpf_limpo,
         $senha_hash
     );
     
@@ -96,10 +101,12 @@ try {
     if (mysqli_stmt_execute($stmt)) {
         $_SESSION['message'] = [
             'type' => 'success',
-            'text' => 'Usuário cadastrado com sucesso! Você já pode fazer o login.'
+            'text' => 'Usuário cadastrado com sucesso! Faça o login.'
         ];
+        // ALTERAÇÃO AQUI: Define o redirecionamento para o LOGIN em caso de SUCESSO
+        $redirect_url = 'index.php?menuop=login'; 
     } else {
-        if (mysqli_errno($conexao) == 1062) {
+        if (mysqli_errno($conexao) == 1062) { // Código de erro para entrada duplicada
             if (strpos(mysqli_error($conexao), 'email') !== false) {
                  throw new Exception("Este e-mail já está cadastrado.");
             } else if (strpos(mysqli_error($conexao), 'cpf') !== false) {
@@ -121,9 +128,10 @@ try {
         'type' => 'error',
         'text' => 'Erro ao cadastrar: ' . $e->getMessage()
     ];
+    // Em caso de erro, o $redirect_url continua sendo 'index.php?menuop=cadastro' (o padrão)
 }
 
-// 7. Redireciona o usuário de volta para a página de cadastro
-header('Location: index.php?menuop=cadastro');
+// 7. Redireciona para a URL definida (login em sucesso, cadastro em erro)
+header("Location: " . $redirect_url);
 exit();
 ?>

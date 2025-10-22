@@ -36,7 +36,7 @@ include_once("conexao.php");
                         <p class="text-muted">É rápido e fácil.</p>
                     </div>
 
-                    <form method="post" action="index.php?menuop=insereusuario">
+                    <form method="post" action="insereusuario.php">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nome" class="form-label">Nome Completo</label>
