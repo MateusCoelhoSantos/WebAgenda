@@ -21,6 +21,15 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
     <style>
         .table td, .table th { vertical-align: middle; }
         .details-img { width: 100%; height: 360px; object-fit: cover; border-radius: .375rem; }
+         /* Estilos adicionados para o collapse */
+        .collapse-row td {
+            padding: 0 !important;
+            border-top: none; 
+        }
+        .collapse-content {
+            background-color: #f8f9fa; /* Um cinza bem claro */
+            padding: 1.5rem; /* Aumentei o padding */
+        }
     </style>
 </head>
 <body style="background-color: #f0f2f5;">
@@ -73,10 +82,15 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                         $pagina = (isset($_GET['pagina'])) ? (int)$_GET['pagina'] : 1;
                         $inicio = ($quantidade * $pagina) - $quantidade;
 
-                        // --- LÓGICA DE FILTRO CORRIGIDA ---
+                        // --- LÓGICA DE FILTRO ---
+                        // --------------------------------------------------------------------
+                        // ALTERAÇÃO 1: Adicionado LEFT JOIN com 'endereco e'
+                        // --------------------------------------------------------------------
                         $from_clause = "FROM reservas r 
                                         INNER JOIN pessoas p ON r.id_pessoa = p.id_pessoa 
-                                        INNER JOIN quartos q ON r.id_quarto = q.id_quarto";
+                                        INNER JOIN quartos q ON r.id_quarto = q.id_quarto
+                                        LEFT JOIN endereco e ON p.id_pessoa = e.id_pessoa"; // <-- JOIN adicionado aqui
+                        
                         $where_conditions = ["r.excluido <> 1"];
                         $params = [];
                         $types = '';
@@ -85,11 +99,9 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                         $status_filtro = $_POST['status_filtro'] ?? '0';
                         $hoje = date('Y-m-d');
                         
-                        // Define as datas: usa as do POST se existirem, senão usa a de hoje como padrão para a busca inicial
                         $dataini = $is_post_request ? ($_POST["dataini"] ?? '') : $hoje;
                         $datafin = $is_post_request ? ($_POST["datafin"] ?? '') : $hoje;
 
-                        // Adiciona filtro de pesquisa por texto
                         if (!empty($pesquisa)) {
                             $where_conditions[] = "(q.num_quarto = ? OR p.nome LIKE ?)";
                             $types .= 'ss';
@@ -97,7 +109,6 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                             $params[] = "%" . $pesquisa . "%";
                         }
 
-                        // Adiciona filtro de data APENAS se as datas estiverem preenchidas
                         if (!empty($dataini) && !empty($datafin)) {
                             $where_conditions[] = "(DATE(r.horarioini) BETWEEN ? AND ?)";
                             $types .= 'ss';
@@ -105,7 +116,6 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                             $params[] = $datafin;
                         }
 
-                        // Adiciona filtro de status
                         if ($status_filtro !== 'all') {
                             $where_conditions[] = "r.finalizado = ?";
                             $types .= 'i';
@@ -121,9 +131,13 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                         $numtotal = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_total))['total'];
                         $totalpagina = ceil($numtotal / $quantidade);
 
+                        // --------------------------------------------------------------------
+                        // ALTERAÇÃO 2: Adicionados campos de endereço (e.*) ao SELECT
+                        // --------------------------------------------------------------------
                         $select_clause = "SELECT r.*, p.nome, p.cpfcnpj, p.telefone, p.email, p.nasc, 
-                                                 q.num_quarto, q.nome_quarto, q.preco_diaria, q.tem_wifi,q.capacidade_adultos,q.capacidade_criancas, q.tem_ar_condicionado, q.tem_tv,
-                                                 (SELECT qi.nome_arquivo FROM quarto_imagens qi WHERE qi.id_quarto = q.id_quarto LIMIT 1) as imagem_quarto";
+                                                e.rua, e.numero, e.bairro, e.cidade, e.uf, e.cep, e.complemento, 
+                                                q.num_quarto, q.nome_quarto, q.preco_diaria, q.tem_wifi,q.capacidade_adultos,q.capacidade_criancas, q.tem_ar_condicionado, q.tem_tv,
+                                                (SELECT qi.nome_arquivo FROM quarto_imagens qi WHERE qi.id_quarto = q.id_quarto LIMIT 1) as imagem_quarto";
                         
                         $sql_data = $select_clause . " " . $from_clause . " " . $where_clause . " ORDER BY r.horarioini ASC LIMIT ?, ?";
                         $types_data = $types . 'ii';
@@ -141,40 +155,73 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                                     $caminho_foto_quarto = "../Imagens/Quartos/quarto-sem-foto.png";
                                 }
                                 $status_badge = $reserva['finalizado'] == 0 ? "<span class='badge bg-success'>Ativo</span>" : "<span class='badge bg-secondary'>Finalizado</span>";
+                                
+                                // --------------------------------------------------------------------
+                                // ALTERAÇÃO 3: Monta a string de endereço do cliente
+                                // --------------------------------------------------------------------
+                                $endereco_cliente = "Endereço não cadastrado.";
+                                if (!empty($reserva['rua'])) {
+                                    $endereco_cliente = htmlspecialchars($reserva['rua']);
+                                    if (!empty($reserva['numero'])) $endereco_cliente .= ", " . htmlspecialchars($reserva['numero']);
+                                    if (!empty($reserva['complemento'])) $endereco_cliente .= " (" . htmlspecialchars($reserva['complemento']) . ")";
+                                    if (!empty($reserva['bairro'])) $endereco_cliente .= " - " . htmlspecialchars($reserva['bairro']);
+                                    if (!empty($reserva['cidade'])) $endereco_cliente .= ".<br>" . htmlspecialchars($reserva['cidade']);
+                                    if (!empty($reserva['uf'])) $endereco_cliente .= " / " . htmlspecialchars($reserva['uf']);
+                                    if (!empty($reserva['cep'])) $endereco_cliente .= "<br>CEP: " . htmlspecialchars($reserva['cep']);
+                                }
                                 ?>
+                                
                                 <tr>
                                     <td class="ps-3"><?= htmlspecialchars($reserva['nome']) ?></td>
                                     <td><?= htmlspecialchars($reserva['num_quarto']) ?> - <?= htmlspecialchars($reserva['nome_quarto']) ?></td>
                                     <td><?= date("d/m H:i", strtotime($reserva['horarioini'])) ?> até <?= date("d/m H:i", strtotime($reserva['horariofin'])) ?></td>
                                     <td><?= $status_badge ?></td>
                                     <td class="text-end pe-3">
-                                        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#detalhes<?= $reserva['id_reserva'] ?>"><i class="bi bi-info-circle"></i> Detalhes</button>
-                                        <?php if ($reserva['finalizado'] == 0): ?>
+                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="collapse" data-bs-target="#detalhes<?= $reserva['id_reserva'] ?>"><i class="bi bi-eye-fill"></i> Detalhes</button> <?php if ($reserva['finalizado'] == 0): ?>
                                             <a href="agenda.php?menuop=finalizaragendamento&idreserva=<?= $reserva["id_reserva"] ?>" class="btn btn-outline-success btn-sm btn-finalizar" title="Finalizar Agendamento"><i class="bi bi-check-circle"></i></a>
                                         <?php endif; ?>
                                         <a href="agenda.php?menuop=editaragendamento&idreserva=<?= $reserva["id_reserva"] ?>" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil-square"></i></a>
                                         <a href="agenda.php?menuop=excluiragendamento&idreserva=<?= $reserva["id_reserva"] ?>" class="btn btn-outline-danger btn-sm btn-excluir" title="Excluir"><i class="bi bi-trash3"></i></a>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td colspan="5" class="p-0 border-0">
-                                        <div id="detalhes<?= $reserva['id_reserva'] ?>" class="collapse">
-                                            <div class="p-3 bg-light">
+                                
+                                <tr class="collapse-row">
+                                    <td colspan="5" class="p-0 border-0"> <div id="detalhes<?= $reserva['id_reserva'] ?>" class="collapse">
+                                            <div class="collapse-content">
                                                 <div class="row">
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-5 mb-3 mb-md-0">
                                                         <h5><i class="bi bi-door-open"></i> Detalhes do Quarto</h5>
                                                         <img src="<?= $caminho_foto_quarto ?>" alt="Foto do Quarto" class="details-img img-thumbnail mb-2">
                                                         <p class="mb-1"><strong>Preço da Diária:</strong> R$ <?= number_format($reserva['preco_diaria'], 2, ',', '.') ?></p>
                                                         <p class="mb-1"><strong>Capacidade:</strong> <i class="bi bi-person-fill"></i> <?= $reserva['capacidade_adultos'] ?> <?php if($reserva['capacidade_criancas'] > 0) echo "+ <i class='bi bi-person' style='font-size:0.8em;'></i> " . $reserva['capacidade_criancas']; ?></p>
-                                                        <p class="mb-0"><strong>Comodidades:</strong> <?php if($reserva['tem_wifi']) echo '<i class="bi bi-wifi" title="Wi-Fi"></i> '; ?><?php if($reserva['tem_ar_condicionado']) echo '<i class="bi bi-snow" title="Ar Condicionado"></i> '; ?><?php if($reserva['tem_tv']) echo '<i class="bi bi-tv" title="Televisão"></i> '; ?></p>
+                                                        <p class="mb-0"><strong>Comodidades:</strong> 
+                                                            <?php 
+                                                            $comodidades_txt = '';
+                                                            if($reserva['tem_wifi']) $comodidades_txt .= '<i class="bi bi-wifi" title="Wi-Fi"></i> '; 
+                                                            if($reserva['tem_ar_condicionado']) $comodidades_txt .= '<i class="bi bi-snow" title="Ar Condicionado"></i> '; 
+                                                            if($reserva['tem_tv']) $comodidades_txt .= '<i class="bi bi-tv" title="Televisão"></i> '; 
+                                                            echo trim($comodidades_txt) ?: 'Nenhuma';
+                                                            ?>
+                                                        </p>
                                                     </div>
-                                                    <div class="col-md-6 border-start">
+                                                    <div class="col-md-7 border-start ps-md-4">
                                                         <h5><i class="bi bi-person-circle"></i> Detalhes do Cliente</h5>
                                                         <p class="mb-1"><strong>Nome:</strong> <?= htmlspecialchars($reserva['nome']) ?></p>
                                                         <p class="mb-1"><strong>CPF/CNPJ:</strong> <?= formatarCpfCnpj($reserva['cpfcnpj']) ?></p>
                                                         <p class="mb-1"><strong>Telefone:</strong> <?= formatarTelefone($reserva['telefone']) ?></p>
-                                                        <p class="mb-1"><strong>Email:</strong> <?= htmlspecialchars($reserva['email']) ?></p>
-                                                        <p class="mb-0"><strong>Nascimento:</strong> <?= date("d/m/Y", strtotime($reserva['nasc'])) ?></p>
+                                                        <p class="mb-1"><strong>Email:</strong> <?= htmlspecialchars($reserva['email'] ?? 'Não informado') ?></p>
+                                                        <p class="mb-1"><strong>Nascimento:</strong> <?= date("d/m/Y", strtotime($reserva['nasc'])) ?></p>
+                                                        
+                                                        <p class="mb-1 mt-3"><strong>Endereço:</strong></p>
+                                                        <p class="mb-0"><?= $endereco_cliente ?></p> <hr>
+                                                        <h5><i class="bi bi-calendar-check"></i> Detalhes da Reserva</h5>
+                                                        <p class="mb-1"><strong>ID Reserva:</strong> <?= $reserva['id_reserva'] ?></p>
+                                                        <p class="mb-1"><strong>Período:</strong> <?= date("d/m/Y H:i", strtotime($reserva['horarioini'])) ?> a <?= date("d/m/Y H:i", strtotime($reserva['horariofin'])) ?></p>
+                                                        <p class="mb-1"><strong>Valor Total:</strong> R$ <?= number_format($reserva['valor'], 2, ',', '.') ?></p>
+                                                        <p class="mb-1"><strong>Pessoas:</strong> <?= $reserva['quant_pessoas'] ?></p>
+                                                        <?php if (!empty($reserva['obs'])): ?>
+                                                        <p class="mb-0"><strong>Observação:</strong> <?= nl2br(htmlspecialchars($reserva['obs'])) ?></p>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -185,7 +232,7 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
                             }
                         } else {
                             $mensagem = $is_post_request ? "Nenhum agendamento encontrado para os filtros." : "Nenhum agendamento ativo encontrado para hoje.";
-                            echo "<tr><td colspan='5' class='text-center p-4'>{$mensagem}</td></tr>";
+                            echo "<tr><td colspan='5' class='text-center p-4'>{$mensagem}</td></tr>"; // Colspan 5
                         }
                         ?>
                     </tbody>
@@ -215,6 +262,7 @@ $is_post_request = ($_SERVER['REQUEST_METHOD'] === 'POST');
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // --- Lógica dos botões Excluir e Finalizar (Sem alterações) ---
     const deleteButtons = document.querySelectorAll('.btn-excluir');
     deleteButtons.forEach(button => {
         button.addEventListener('click', function (event) {
@@ -252,6 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // --- Lógica para preencher datas se não for POST (Sem alterações) ---
     <?php if (!$is_post_request): ?>
         const hojeFormatado = new Date().toISOString().slice(0, 10);
         const dataIniInput = document.querySelector('[name="dataini"]');
@@ -261,6 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <?php endif; ?>
 });
 
+// --- Lógica do Pop-up de Mensagem (Sem alterações) ---
 <?php
 if (isset($_SESSION['message'])) {
     $message = $_SESSION['message'];

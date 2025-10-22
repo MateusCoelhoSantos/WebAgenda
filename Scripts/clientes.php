@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include_once("conexao.php"); 
-include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
+include_once("funcoes.php"); // INCLUÍDO O ARQUIVO DE FUNÇÕES
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -18,6 +18,16 @@ include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
     <style>
         .table td, .table th { vertical-align: middle; }
         .btn-icon { padding: .375rem .5rem; font-size: 1rem; }
+        
+        /* Estilo para a linha que expande, para parecer mais integrada */
+        .collapse-row td {
+            padding: 0 !important;
+            border-top: none; 
+        }
+        .collapse-content {
+            background-color: #f8f9fa; /* Um cinza bem claro */
+            padding: 1rem 1.5rem;
+        }
     </style>
 </head>
 <body style="background-color: #f0f2f5;">
@@ -57,7 +67,8 @@ include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
                             <th class="ps-3">ID</th>
                             <th>Nome</th>
                             <th>CPF/CNPJ</th>
-                            <th>Telefone</th> <th>Tipo</th>
+                            <th>Telefone</th> 
+                            <th>Tipo</th>
                             <th>Gênero</th>
                             <th class="text-end pe-3">Ações</th>
                         </tr>
@@ -69,14 +80,23 @@ include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
                         $inicio = ($quantidade * $pagina) - $quantidade;
                         $pesquisa = $_POST["pesquisa"] ?? "";
 
-                        // Adicionei a busca do telefone na query, caso não estivesse
-                        $sql = "SELECT id_pessoa, nome, cpfcnpj, telefone, nasc, f_j, genero, 
-                                CASE WHEN f_j = 0 THEN 'Pessoa Física' WHEN f_j = 1 THEN 'Pessoa Jurídica' END AS 'tipagem_pessoa',
-                                CASE WHEN genero = 'M' THEN 'Masculino' WHEN genero = 'F' THEN 'Feminino' WHEN genero = 'N' THEN 'Não Informado' END AS 'genero_texto',
-                                DATE_FORMAT(nasc, '%d/%m/%Y') as data_nasc
-                                FROM pessoas
-                                WHERE (excluido <> 1) AND tipopessoa = 1 AND (id_pessoa = ? OR nome LIKE ?)
-                                ORDER BY nome ASC
+                        // --------------------------------------------------------------------
+                        // ALTERAÇÃO 1: Adicionado 'p.rgie' ao SELECT
+                        // --------------------------------------------------------------------
+                        $sql = "SELECT 
+                                    p.id_pessoa, p.nome, p.cpfcnpj, p.telefone, p.nasc, p.f_j, p.genero, p.rgie, 
+                                    e.rua, e.numero, e.bairro, e.cidade, e.uf, e.cep, e.complemento,
+                                    CASE WHEN p.f_j = 0 THEN 'Pessoa Física' WHEN p.f_j = 1 THEN 'Pessoa Jurídica' END AS 'tipagem_pessoa',
+                                    CASE WHEN p.genero = 'M' THEN 'Masculino' WHEN p.genero = 'F' THEN 'Feminino' WHEN p.genero = 'N' THEN 'Não Informado' END AS 'genero_texto',
+                                    DATE_FORMAT(p.nasc, '%d/%m/%Y') as data_nasc
+                                FROM 
+                                    pessoas AS p
+                                LEFT JOIN 
+                                    endereco AS e ON p.id_pessoa = e.id_pessoa
+                                WHERE 
+                                    (p.excluido <> 1) AND p.tipopessoa = 1 AND (p.id_pessoa = ? OR p.nome LIKE ?)
+                                ORDER BY 
+                                    p.nome ASC
                                 LIMIT ?, ?";
                         
                         $stmt = mysqli_prepare($conexao, $sql);
@@ -87,30 +107,44 @@ include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
 
                         if (mysqli_num_rows($RS) > 0) {
                             foreach ($RS as $dados) {
-                                // CÓDIGO NOVO COM TONS PASTEL AINDA MAIS SUAVES
+                                // Cores dos badges
+                                $badge_genero_cor = 'bg-secondary-subtle text-secondary-emphasis';
+                                if ($dados['genero'] == 'M') $badge_genero_cor = 'bg-primary-subtle text-primary-emphasis';
+                                elseif ($dados['genero'] == 'F') $badge_genero_cor = 'bg-danger-subtle text-danger-emphasis';
+                                $badge_pessoa_cor = ($dados['f_j'] == 0) ? 'bg-success-subtle text-success-emphasis' : 'bg-dark-subtle text-dark-emphasis';
 
-                                // Define a cor do badge de Gênero
-                                $badge_genero_cor = 'bg-secondary-subtle text-secondary-emphasis'; // Padrão: Cinza bem claro
-                                if ($dados['genero'] == 'M') {
-                                    $badge_genero_cor = 'bg-primary-subtle text-primary-emphasis'; // Azul pastel
-                                } elseif ($dados['genero'] == 'F') {
-                                    $badge_genero_cor = 'bg-danger-subtle text-danger-emphasis'; // Rosa / Vermelho pastel
-                                }
+                                // String de Endereço
+                                $endereco_completo = "";
+                                if (!empty($dados['rua'])) $endereco_completo .= htmlspecialchars($dados['rua']);
+                                if (!empty($dados['numero'])) $endereco_completo .= ", " . htmlspecialchars($dados['numero']);
+                                if (!empty($dados['complemento'])) $endereco_completo .= " (" . htmlspecialchars($dados['complemento']) . ")";
+                                if (!empty($dados['bairro'])) $endereco_completo .= " - " . htmlspecialchars($dados['bairro']);
+                                if (!empty($dados['cidade'])) $endereco_completo .= ".<br>" . htmlspecialchars($dados['cidade']);
+                                if (!empty($dados['uf'])) $endereco_completo .= " / " . htmlspecialchars($dados['uf']);
+                                if (!empty($dados['cep'])) $endereco_completo .= "<br>CEP: " . htmlspecialchars($dados['cep']);
+                                if (empty(trim(str_replace("<br>", "", $endereco_completo)))) $endereco_completo = "Endereço não cadastrado.";
+                                
+                                $collapseId = "collapse-" . $dados['id_pessoa'];
 
-                                // Define a cor do badge de Tipo de Pessoa
-                                $badge_pessoa_cor = ($dados['f_j'] == 0) 
-                                    ? 'bg-success-subtle text-success-emphasis' // Verde pastel
-                                    : 'bg-dark-subtle text-dark-emphasis';      // Grafite bem claro
-
+                                // LINHA 1: DADOS PRINCIPAIS DO CLIENTE
                                 echo "<tr>";
                                 echo "<td class='ps-3'>" . htmlspecialchars($dados['id_pessoa']) . "</td>";
                                 echo "<td>" . htmlspecialchars($dados['nome']) . "</td>";
-                                // APLICAÇÃO DA FORMATAÇÃO
-                                echo "<td>" . htmlspecialchars(formatarCpfCnpj($dados['cpfcnpj'])) . "</td>";
+                                echo "<td>" . htmlspecialchars(formatarCpfCnpj($dados['cpfcnpj'])) . "</td>"; // A linha principal ainda mostra o CPF/CNPJ
                                 echo "<td>" . htmlspecialchars(formatarTelefone($dados['telefone'])) . "</td>";
                                 echo "<td><span class='badge " . $badge_pessoa_cor . "'>" . htmlspecialchars($dados['tipagem_pessoa']) . "</span></td>";
                                 echo "<td><span class='badge " . $badge_genero_cor . "'>" . htmlspecialchars($dados['genero_texto']) . "</span></td>";
                                 echo "<td class='text-end pe-3'>
+                                        
+                                        <a href='#" . $collapseId . "' 
+                                           class='btn btn-outline-info btn-icon' 
+                                           title='Detalhes'
+                                           data-bs-toggle='collapse' 
+                                           role='button' 
+                                           aria-expanded='false' 
+                                           aria-controls='" . $collapseId . "'>
+                                            <i class='bi bi-eye-fill'></i>
+                                        </a>
                                         <a href='agenda.php?menuop=editarcliente&idcli=" . $dados['id_pessoa'] . "' class='btn btn-outline-primary btn-icon' title='Alterar'>
                                             <i class='bi bi-pencil-square'></i>
                                         </a>
@@ -119,6 +153,40 @@ include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
                                         </a>
                                       </td>";
                                 echo "</tr>";
+
+                                // LINHA 2: LINHA DO COLLAPSE (COM OS DETALHES)
+                                echo "<tr class='collapse-row'>";
+                                echo "<td colspan='7'>";
+                                echo "  <div class='collapse' id='" . $collapseId . "'>";
+                                echo "    <div class='collapse-content'>";
+                                echo "      <div class='row'>";
+                                echo "          <div class='col-md-6'>";
+                                echo "              <p class='mb-1'><strong>Data de Nasc.:</strong> " . htmlspecialchars($dados['data_nasc']) . "</p>";
+                                echo "          </div>";
+                                // --------------------------------------------------------------------
+                                // ALTERAÇÃO 2: LÓGICA DO CAMPO (RG ou IE)
+                                // Mostra RG para Pessoa Física (f_j = 0)
+                                // Mostra IE para Pessoa Jurídica (f_j = 1)
+                                // --------------------------------------------------------------------
+                                echo "          <div class='col-md-6'>";
+                                $rgie_formatado = (!empty($dados['rgie'])) ? htmlspecialchars($dados['rgie']) : "Não informado";
+                                
+                                if ($dados['f_j'] == 0) { // Pessoa Física
+                                    echo "          <p class='mb-1'><strong>RG:</strong> " . $rgie_formatado . "</p>";
+                                } else { // Pessoa Jurídica
+                                    echo "          <p class='mb-1'><strong>Inscrição Estadual (IE):</strong> " . $rgie_formatado . "</p>";
+                                }
+                                echo "          </div>";
+                                echo "          <div class='col-12 mt-2'>";
+                                echo "              <p class='mb-1'><strong>Endereço:</strong></p>";
+                                echo "              <p class='mb-0'>" . $endereco_completo . "</p>"; 
+                                echo "          </div>";
+                                echo "      </div>";
+                                echo "    </div>";
+                                echo "  </div>";
+                                echo "</td>";
+                                echo "</tr>";
+
                             }
                         } else {
                             echo "<tr><td colspan='7' class='text-center p-4'>Nenhum cliente encontrado.</td></tr>";
@@ -130,7 +198,8 @@ include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
         </div>
 
         <?php
-        $sqltotal = "SELECT COUNT(id_pessoa) as total FROM pessoas WHERE (excluido <> 1) AND tipopessoa = 1 AND (id_pessoa = ? OR nome LIKE ?)";
+        // PAGINAÇÃO (Sem alteração)
+        $sqltotal = "SELECT COUNT(p.id_pessoa) as total FROM pessoas AS p WHERE (p.excluido <> 1) AND p.tipopessoa = 1 AND (p.id_pessoa = ? OR p.nome LIKE ?)";
         $stmt_total = mysqli_prepare($conexao, $sqltotal);
         mysqli_stmt_bind_param($stmt_total, 'ss', $pesquisa, $termo_pesquisa);
         mysqli_stmt_execute($stmt_total);
@@ -164,7 +233,7 @@ include_once("funcoes.php"); // PASSO 1: INCLUÍDO O ARQUIVO DE FUNÇÕES
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Pop-up de confirmação para exclusão
+    // SCRIPT DE EXCLUSÃO (Sem alteração)
     const deleteButtons = document.querySelectorAll('.btn-excluir');
     deleteButtons.forEach(button => {
         button.addEventListener('click', function (event) {
@@ -188,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Pop-up de feedback (sucesso/erro)
+// SCRIPT DE FEEDBACK (Sem alteração)
 <?php
 if (isset($_SESSION['message'])) {
     $message = $_SESSION['message'];

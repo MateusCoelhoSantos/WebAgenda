@@ -34,7 +34,20 @@ include_once("funcoes.php");
                             <div class="col-12 col-md-4"><label for="codcliente" class="form-label">Código Cliente</label><input type="text" class="form-control" id="codcliente" name="codcliente" readonly></div>
                             <div class="col-12 col-md-8 position-relative"><label for="nomecliente" class="form-label">Cliente</label><input type="text" class="form-control" id="nomecliente" name="nomecliente" required autocomplete="off" placeholder="Digite para pesquisar..."><div id="listaClientes" class="list-group position-absolute w-100"></div></div>
                         </div>
-                        <div id="infoCliente" class="info-box d-none"><p class="mb-1"><strong>CPF/CNPJ:</strong> <span id="cpfcnpj"></span></p><p class="mb-1"><strong>Telefone:</strong> <span id="telefone"></span></p><p class="mb-0"><strong>Email:</strong> <span id="email"></span></p></div>
+                        
+                        <div id="infoCliente" class="info-box d-none">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>CPF/CNPJ:</strong> <span id="cpfcnpj"></span></p>
+                                    <p class="mb-1"><strong>Telefone:</strong> <span id="telefone"></span></p>
+                                    <p class="mb-0"><strong>Email:</strong> <span id="email"></span></p>
+                                </div>
+                                <div class="col-md-6 mt-2 mt-md-0">
+                                    <p class="mb-1"><strong>Endereço:</strong></p>
+                                    <p class="mb-0" id="endereco_completo"></p>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="row mb-3">
                             <div class="col-12 col-md-4"><label for="numquarto" class="form-label">ID Quarto</label><input type="text" class="form-control" id="numquarto" name="numquarto" readonly></div>
@@ -127,13 +140,28 @@ document.addEventListener("DOMContentLoaded", () => {
                         const item = document.createElement("a");
                         item.classList.add("list-group-item", "list-group-item-action");
                         item.style.cursor = "pointer";
-                        item.textContent = `${cliente.nome} (${cliente.cpfcnpj})`;
+                        item.textContent = `${cliente.nome} (${formatarCpfCnpjJS(cliente.cpfcnpj)})`; // Formatado já na lista
                         item.addEventListener("click", () => {
                             nomeCliente.value = cliente.nome;
                             document.getElementById("codcliente").value = cliente.id_pessoa;
                             document.getElementById("cpfcnpj").innerText = formatarCpfCnpjJS(cliente.cpfcnpj);
                             document.getElementById("telefone").innerText = formatarTelefoneJS(cliente.telefone);
-                            document.getElementById("email").innerText = cliente.email;
+                            document.getElementById("email").innerText = cliente.email || "Não informado";
+                            
+                            // --- MUDANÇA 2: JAVASCRIPT para preencher o endereço ---
+                            let enderecoStr = "Endereço não cadastrado.";
+                            if (cliente.rua) {
+                                enderecoStr = cliente.rua;
+                                if (cliente.numero) enderecoStr += ", " + cliente.numero;
+                                if (cliente.complemento) enderecoStr += " (" + cliente.complemento + ")";
+                                if (cliente.bairro) enderecoStr += " - " + cliente.bairro;
+                                if (cliente.cidade) enderecoStr += ".<br>" + cliente.cidade; // <-- <br> para quebra de linha
+                                if (cliente.uf) enderecoStr += " / " + cliente.uf;
+                                if (cliente.cep) enderecoStr += "<br>CEP: " + cliente.cep;
+                            }
+                            // Usamos .innerHTML para permitir o <br>
+                            document.getElementById("endereco_completo").innerHTML = enderecoStr;
+
                             infoCliente.classList.remove("d-none");
                             listaClientes.innerHTML = "";
                         });
@@ -143,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 
-    // --- Autocomplete Quartos ---
+    // --- Autocomplete Quartos (SEM MUDANÇAS) ---
     const descQuarto = document.getElementById("descquarto");
     const listaQuartos = document.getElementById("listaQuartos");
     const infoQuarto = document.getElementById("infoQuarto");
@@ -160,7 +188,6 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(data => {
                 listaQuartos.innerHTML = "";
-                // --- MUDANÇA AQUI ---
                 if (data.length === 0) {
                     const noResultsItem = document.createElement("span");
                     noResultsItem.classList.add("list-group-item", "text-muted");
@@ -207,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 
-    // --- LÓGICA DE CÁLCULO DE VALOR TOTAL ---
+    // --- LÓGICA DE CÁLCULO DE VALOR TOTAL (SEM MUDANÇAS) ---
     const valorInput = document.getElementById('valor');
     function calcularValorTotal() {
         const dataInicio = new Date(inputHorarioIni.value);

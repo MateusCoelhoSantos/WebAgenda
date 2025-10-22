@@ -8,14 +8,18 @@ include_once("funcoes.php");
 
 $idreserva = $_GET['idreserva'] ?? 0;
 
-// --- CONSULTA CORRIGIDA: Usa 'q.nome_quarto' e busca todos os detalhes ---
-$sql = "SELECT r.*, p.nome, p.cpfcnpj, p.telefone, p.email, 
+// --- ALTERAÇÃO 1: SQL com LEFT JOIN para buscar endereço ---
+$sql = "SELECT r.*, 
+               p.nome, p.cpfcnpj, p.telefone, p.email,
+               e.rua, e.numero, e.bairro, e.cidade, e.uf, e.cep, e.complemento,
                q.num_quarto, q.nome_quarto, q.preco_diaria, q.capacidade_adultos, q.capacidade_criancas, q.tem_wifi, q.tem_ar_condicionado, q.tem_tv,
                (SELECT qi.nome_arquivo FROM quarto_imagens qi WHERE qi.id_quarto = q.id_quarto LIMIT 1) as imagem_quarto
         FROM reservas r
         INNER JOIN pessoas p ON r.id_pessoa = p.id_pessoa
         INNER JOIN quartos q ON r.id_quarto = q.id_quarto
+        LEFT JOIN endereco e ON p.id_pessoa = e.id_pessoa  -- Adicionado JOIN
         WHERE r.id_reserva = ?";
+
 $stmt = $conexao->prepare($sql);
 $stmt->bind_param("i", $idreserva);
 $stmt->execute();
@@ -24,6 +28,19 @@ $reserva = $stmt->get_result()->fetch_assoc();
 if (!$reserva) {
     die("Reserva não encontrada!");
 }
+
+// Monta a string de endereço (igual à tela de cadastro)
+$endereco_completo_inicial = "Endereço não cadastrado.";
+if (!empty($reserva['rua'])) {
+    $endereco_completo_inicial = htmlspecialchars($reserva['rua']);
+    if (!empty($reserva['numero'])) $endereco_completo_inicial .= ", " . htmlspecialchars($reserva['numero']);
+    if (!empty($reserva['complemento'])) $endereco_completo_inicial .= " (" . htmlspecialchars($reserva['complemento']) . ")";
+    if (!empty($reserva['bairro'])) $endereco_completo_inicial .= " - " . htmlspecialchars($reserva['bairro']);
+    if (!empty($reserva['cidade'])) $endereco_completo_inicial .= ".<br>" . htmlspecialchars($reserva['cidade']);
+    if (!empty($reserva['uf'])) $endereco_completo_inicial .= " / " . htmlspecialchars($reserva['uf']);
+    if (!empty($reserva['cep'])) $endereco_completo_inicial .= "<br>CEP: " . htmlspecialchars($reserva['cep']);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -52,7 +69,19 @@ if (!$reserva) {
                             <div class="col-12 col-md-4"><label for="codcliente" class="form-label">Código Cliente</label><input type="text" class="form-control" id="codcliente" name="codcliente" value="<?= htmlspecialchars($reserva['id_pessoa']) ?>" readonly></div>
                             <div class="col-12 col-md-8 position-relative"><label for="nomecliente" class="form-label">Cliente</label><input type="text" class="form-control" id="nomecliente" name="nomecliente" value="<?= htmlspecialchars($reserva['nome']) ?>" required autocomplete="off"><div id="listaClientes" class="list-group position-absolute w-100"></div></div>
                         </div>
-                        <div id="infoCliente" class="info-box"><p class="mb-1"><strong>CPF/CNPJ:</strong> <span id="cpfcnpj"><?= htmlspecialchars(formatarCpfCnpj($reserva['cpfcnpj'])) ?></span></p><p class="mb-1"><strong>Telefone:</strong> <span id="telefone"><?= htmlspecialchars(formatarTelefone($reserva['telefone'])) ?></span></p><p class="mb-0"><strong>Email:</strong> <span id="email"><?= htmlspecialchars($reserva['email']) ?></span></p></div>
+
+                        <div id="infoCliente" class="info-box">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>CPF/CNPJ:</strong> <span id="cpfcnpj"><?= htmlspecialchars(formatarCpfCnpj($reserva['cpfcnpj'])) ?></span></p>
+                                    <p class="mb-1"><strong>Telefone:</strong> <span id="telefone"><?= htmlspecialchars(formatarTelefone($reserva['telefone'])) ?></span></p>
+                                    <p class="mb-0"><strong>Email:</strong> <span id="email"><?= htmlspecialchars($reserva['email'] ?? 'Não informado') ?></span></p>
+                                </div>
+                                <div class="col-md-6 mt-2 mt-md-0">
+                                    <p class="mb-1"><strong>Endereço:</strong></p>
+                                    <p class="mb-0" id="endereco_completo"><?= $endereco_completo_inicial ?></p> </div>
+                            </div>
+                        </div>
 
                         <div class="row mb-3">
                             <div class="col-12 col-md-4"><label for="numquarto" class="form-label">ID Quarto</label>
@@ -85,6 +114,7 @@ if (!$reserva) {
                                             <?php if($reserva['tem_wifi']) echo '<i class="bi bi-wifi" title="Wi-Fi"></i> '; ?>
                                             <?php if($reserva['tem_ar_condicionado']) echo '<i class="bi bi-snow" title="Ar Condicionado"></i> '; ?>
                                             <?php if($reserva['tem_tv']) echo '<i class="bi bi-tv" title="Televisão"></i> '; ?>
+                                            <?php if(!$reserva['tem_wifi'] && !$reserva['tem_ar_condicionado'] && !$reserva['tem_tv']) echo 'Nenhuma'; ?>
                                         </span>
                                     </p>
                                 </div>
@@ -119,21 +149,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Funções de Formatação ---
     function formatarCpfCnpjJS(numero) {
         const numeroLimpo = String(numero).replace(/\D/g, '');
-        if (numeroLimpo.length === 11) {
-            return numeroLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-        } else if (numeroLimpo.length === 14) {
-            return numeroLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-        }
+        if (numeroLimpo.length === 11) { return numeroLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'); } 
+        else if (numeroLimpo.length === 14) { return numeroLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5'); }
         return numero;
     }
 
     function formatarTelefoneJS(telefone) {
         const numeroLimpo = String(telefone).replace(/\D/g, '');
-        if (numeroLimpo.length === 11) {
-            return numeroLimpo.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1) $2 $3-$4');
-        } else if (numeroLimpo.length === 10) {
-            return numeroLimpo.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-        }
+        if (numeroLimpo.length === 11) { return numeroLimpo.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1) $2 $3-$4'); } 
+        else if (numeroLimpo.length === 10) { return numeroLimpo.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3'); }
         return telefone;
     }
 
@@ -156,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.forEach(cliente => {
                     const item = document.createElement("a");
                     item.classList.add("list-group-item", "list-group-item-action");
-                    item.textContent = `${cliente.nome} (${cliente.cpfcnpj})`;
+                    item.textContent = `${cliente.nome} (${formatarCpfCnpjJS(cliente.cpfcnpj)})`; // Formatado já na lista
                     item.style.cursor = "pointer";
                     item.addEventListener("click", (e) => {
                         e.preventDefault();
@@ -164,7 +188,21 @@ document.addEventListener("DOMContentLoaded", () => {
                         document.getElementById("codcliente").value = cliente.id_pessoa;
                         document.getElementById("cpfcnpj").innerText = formatarCpfCnpjJS(cliente.cpfcnpj);
                         document.getElementById("telefone").innerText = formatarTelefoneJS(cliente.telefone);
-                        document.getElementById("email").innerText = cliente.email;
+                        document.getElementById("email").innerText = cliente.email || "Não informado";
+                        
+                        // --- ALTERAÇÃO 3: JavaScript do cliente preenchendo endereço ---
+                        let enderecoStr = "Endereço não cadastrado.";
+                        if (cliente.rua) {
+                            enderecoStr = cliente.rua;
+                            if (cliente.numero) enderecoStr += ", " + cliente.numero;
+                            if (cliente.complemento) enderecoStr += " (" + cliente.complemento + ")";
+                            if (cliente.bairro) enderecoStr += " - " + cliente.bairro;
+                            if (cliente.cidade) enderecoStr += ".<br>" + cliente.cidade;
+                            if (cliente.uf) enderecoStr += " / " + cliente.uf;
+                            if (cliente.cep) enderecoStr += "<br>CEP: " + cliente.cep;
+                        }
+                        document.getElementById("endereco_completo").innerHTML = enderecoStr;
+
                         listaClientes.innerHTML = "";
                     });
                     listaClientes.appendChild(item);
@@ -172,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 
-    // --- Autocomplete Quartos ---
+    // --- Autocomplete Quartos (SEM MUDANÇAS) ---
     const descQuarto = document.getElementById("descquarto");
     const listaQuartos = document.getElementById("listaQuartos");
     const infoQuarto = document.getElementById("infoQuarto");
@@ -228,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 
-    // --- LÓGICA DE CÁLCULO DE VALOR TOTAL ---
+    // --- LÓGICA DE CÁLCULO DE VALOR TOTAL (SEM MUDANÇAS) ---
     function calcularValorTotal() {
         const dataInicio = new Date(inputHorarioIni.value);
         const dataFim = new Date(inputHorarioFin.value);
@@ -249,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
     inputHorarioIni.addEventListener('change', calcularValorTotal);
     inputHorarioFin.addEventListener('change', calcularValorTotal);
     
-    // Roda o cálculo uma vez no carregamento da página
+    // Roda o cálculo uma vez no carregamento da página (já que os dados vêm preenchidos)
     calcularValorTotal();
 });
 </script>
