@@ -38,9 +38,9 @@ include_once("conexao.php");
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="index.php?menuop=home">Home</a>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link" href="index.php?menuop=cadastro">Cadastro</a>
                     </li>
